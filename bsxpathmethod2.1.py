@@ -17,8 +17,6 @@ def OnlyStr(s,oth=''):
    return s;
 #print(OnlyStr(a))
 
-
-
 try:
       response = Request(someurl)
       content = urllib2.urlopen(someurl).read()
@@ -38,11 +36,12 @@ else:
     #project_name
     project_name_str = sel.xpath('//*[@id="content-wrap"]/section/div[1]/div/h2/a/text()')
     project_name = ''.join(project_name_str)
-    print project_name
+
 
     #projetc_ID
     #created_at/setupdate
     #deadline_quot
+    #createddate/set up date
     for line in the_page1:
         #project_ID_str
         if 'data'  in line:
@@ -71,6 +70,7 @@ else:
                     deadline_quot_str = word.split('&quot;:')[1]
 
     #location_id
+    #createddate/set up date
     location_id_str = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/div[1]/div/a[1]/text()')
     location_id =''.join(location_id_str)
     project_ID = ''.join(project_ID_str)
@@ -78,25 +78,20 @@ else:
     #state_changed_at=''.join(state_changed_at_str)
     deadline_quot=''.join(deadline_quot_str)
 
-    print 'location_id:',location_id
-    print 'project ID:', project_ID
-    print 'deadline:',deadline_quot
-    #createddate/set up date
-    print 'created_at:',created_at
-    #print 'state_changed_at:',state_changed_at_str
+
 
 
 
     #backers_count
     backers_count= sel.xpath('//*[@id="backers_count"]/data/text()')
-    print 'backers_count:', ''.join(backers_count)
+
 
     #goal
     goal = sel.xpath('//*[@id="stats"]/div/div[2]/span/span[1]/text()')
-    print 'goal:',''.join(goal)
+
     #pledged_amount
     pledged_amount = sel.xpath('//*[@id="pledged"]/data/text()')
-    print 'pledged_amount',''.join(pledged_amount)
+
     #data_poll_url
     data_pool_url = sel.xpath('//*[@id="stats"]/div/div[3]/div/div//@data-poll_url')
 
@@ -110,15 +105,15 @@ else:
 
     #updates
     updates = sel.xpath('//*[@id="content-wrap"]/div[2]/div/div/div/div[2]/a[3]/span/text()')
-    print 'updates number:',''.join(updates)
+
 
     #rewardsstructure
     #rewards
     rewards_level = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/h2/span[1]/text()')
-    print 'rewards_level:' ,rewards_level
+
     #print rewards_level_name
     rewards_level_name = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/h3/text()')
-    print 'rewards_level_name:' ,rewards_level_name
+
     #print rewards_level.spilt()
     #rewards_level_description
     #print len(rewards_level)
@@ -139,7 +134,7 @@ else:
         rewards_level_description_split = rewards_level_description_split_list
         rewards_level_description_split =''.join(rewards_level_description_split)
         rewards_level_description.append(rewards_level_description_split)
-    print 'rewards_level_description:' ,rewards_level_description
+
     #print len(rewards_level_description)
 
     #pledge__limit
@@ -153,7 +148,6 @@ else:
         c = str(i)
         ship_location_info_a = '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
         ship_location_info_b =']/div[2]/div[2]/div[2]/span[2]/text()'
-
         #print c
         pledge_limit_a += c
         pledge_limit_a += pledge_limit_b
@@ -171,43 +165,42 @@ else:
         ship_location_info_split = ship_location_info_split_list
         #print ship_location_info_split, ship_location_info_split_list
         ship_location_info_split =''.join(ship_location_info_split)
-        ship_location_info[i-1]= str(ship_location_info_split)
-    print 'pledge__limit:' , pledge_limit
-    print 'ship_location_info:' , ship_location_info
+        ship_location_info_split= str(ship_location_info_split)
+        #ship_location_info[i-1] = ship_location_info_split
+
 
 
 
 
     #deadline
     deadline_xpath= sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[1]/div/div/p/time/text()')
-    print 'deadline_xpath:', ''.join(deadline_xpath)
+
 
     #description
     description = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/p/text()')
-    print 'description:',''.join(description)
+
 
     #url
 
     #creator_info_hub
     #creator_short_name
     creator_short_name = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/h5/a/text()')
-    print 'creator_short_name:',''.join(creator_short_name)
+
 
 
     #creator_url
     creator_personal_url = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/div[3]/div/div[2]/p/a//@href')
-    print 'creator_personal_url:',''.join(creator_personal_url)
+
     #creator_bio_info
     creator_bio_info_shorturl_list = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/p/a[1]//@href')
 
     creator_bio_info_url = root_url + ''.join(str(x) for x in creator_bio_info_shorturl_list)
-    print 'creator_bio_info_url:',''.join(creator_bio_info_url)
 
     #turn to new creator_bio_websites
     creator_bio_info = urllib2.urlopen(creator_bio_info_url).read()
     creator_bio_info_sel= etree.HTML(creator_bio_info)
     creator_full_name = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[1]/span/span[2]/text()')
-    print 'creator_full_name:',''.join(creator_full_name)
+
 
 
     #creator_buildhistory
@@ -217,8 +210,7 @@ else:
     backed_projects_number_list = creator_buildhistory_has_backed_projects_number
     creator_buildhistory_has_built_projects_number = "".join(built_projects_number_list).strip()
     creator_buildhistory_has_backed_projects_number = "".join(backed_projects_number_list).strip()
-    print 'creator_buildhistory_has_built_projects_number:',creator_buildhistory_has_built_projects_number
-    print 'creator_buildhistory_has_backed_projects_number:',creator_buildhistory_has_backed_projects_number
+
 
     #facebook information
     creator_friends__facebook_number_potential = str(creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/text()'))
@@ -229,8 +221,6 @@ else:
         creator_Facebook_url= creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/span[2]/a//@href')
         creator_friends__facebook_number_str = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/span[2]/a/text()')
         creator_friends__facebook_number = ''.join(creator_friends__facebook_number_str)
-    print 'creator_friends__facebook_number:' ,''.join(creator_friends__facebook_number)
-    print 'creator_Facebook_url:' ,''.join(creator_Facebook_url)
 
 
     data_pool_url = sel.xpath('//*[@id="stats"]/div/div[3]/div/div//@data-poll_url')
@@ -251,23 +241,62 @@ else:
     dics = dict(name)
     #print dics
     #print 'value: %s' % dics.items()
-    print 'backers_count:',  dics['backerscount']
+
     state = dics['state']
-    print 'state:' , state
+
     pledged = dics ['pledged']
-    print 'pledged:', pledged
+
     state_changed_at = dics['statechangedat']
-    print 'state_changed_at:',state_changed_at
+
     comments_count = dics['commentscount']
-    print 'comments_count:', comments_count
+
+
     id = dics['id']
+
+
+
+    print 'project_name:', project_name
+    print 'location_id:',location_id
+    print 'project ID:', project_ID
     print 'id :' ,id
+    print 'projetc_state:' , state
+
+    print 'deadline:',deadline_quot
+    print 'deadline_xpath:', ''.join(deadline_xpath)
+    print 'created_at:',created_at
+    print 'state_changed_at:',state_changed_at
+    print 'backers_count:', ''.join(backers_count)
+    print 'backers_count:',  dics['backerscount']
+    print 'goal:',''.join(goal)
+    print 'pledged_amount',''.join(pledged_amount)
+    print 'pledged:', pledged
+
+    print 'description:',''.join(description)
+    print 'creator_short_name:',''.join(creator_short_name)
+    print 'creator_personal_url:',''.join(creator_personal_url)
+    print 'creator_bio_info_url:',''.join(creator_bio_info_url)
+    print 'creator_full_name:',''.join(creator_full_name)
+    print 'creator_buildhistory_has_built_projects_number:',creator_buildhistory_has_built_projects_number
+    print 'creator_buildhistory_has_backed_projects_number:',creator_buildhistory_has_backed_projects_number
+    print 'creator_friends__facebook_number:' ,''.join(creator_friends__facebook_number)
+    print 'creator_Facebook_url:' ,''.join(creator_Facebook_url)
+    print 'updates number:',''.join(updates)
+    print 'comments_count:', comments_count
+
+
+
+
+    #multi-data
+    print 'rewards_level:' ,rewards_level
+    print 'rewards_level_name:' ,rewards_level_name
+    print 'rewards_level_description:' ,rewards_level_description
+    print 'pledge__limit:' , pledge_limit
+    #print 'ship_location_info:' , ship_location_info
 
 
 
 
 
-    #creator_Facebook_url_potential_with_connecting_facebook = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/span[2]/a//@href')
 
 
 
@@ -278,11 +307,12 @@ else:
 
 
 
-    #projetc_creator_name
 
-    #projetc_creator_name = selector,xpath
 
-    #projetc_creator_url
+
+
+
+
 
 
 

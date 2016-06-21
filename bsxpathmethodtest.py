@@ -22,96 +22,82 @@ except URLError as e:
         print 'The server couldn\'t fulfill the request.'
         print 'Error code: ', e.code
 else:
+    #rewards
+    #print rewards_level
+    rewards_level = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/h2/span[1]/text()')
+    #print rewards_level
+    #print len(rewards_level)
+    rewards_level_name = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/h3/text()')
+    #print rewards_level_name
 
 
-    #data_poll_url
-    data_pool_url = sel.xpath('//*[@id="stats"]/div/div[3]/div/div//@data-poll_url')
-    data_pool_url = ''.join(str(x) for x in data_pool_url)
-
-    print data_pool_url
-    #turn to new websites
-    data_pool_url_websites = urllib2.urlopen(data_pool_url).read()
-    data_pool_url_websites = ''.join(str(x) for x in data_pool_url_websites)
-    a = data_pool_url_websites#.split(',')
-    #print a
-
-    def OnlyStr(s,oth=''):
+    #def rerange_xpath(,oth=''):
        #s2 = s.lower();
-       fomart = 'abcdefghijklmnopqrstuvwxyz0123456789:,'
-       for c in s:
-           if not c in fomart:
-               s = s.replace(c,'');
-       return s;
+     #  fomart = 'abcdefghijklmnopqrstuvwxyz0123456789:,'
+      # for c in s:
+        #   if not c in fomart:
+        #       s = s.replace(c,'');
+       #return s;
     #print(OnlyStr(a))
-    name =[]
-    b = OnlyStr(a).strip('project:')
-    print len(b.split(','))-1
-    for i in range(0,len(b.split(','))):
-        name.append(b.split(',')[i].split(':'))
-    dics = dict(name)
-    print dics
-    print 'value: %s' % dics.items()
-    print 'backers_count:',  dics['backerscount']
-    state = dics['state']
-    print 'state:' , state
-    pledged = dics ['pledged']
-    print 'pledged:', pledged
-    state_changed_at = dics['statechangedat']
-    print 'state_changed_at:',state_changed_at
-    comments_count = dics['commentscount']
-    print 'comments_count:', comments_count
-    id = dics['id']
-    print 'id :' ,id
-
-
-
-
-
-
-
-
-
-
-    #for i in range(0,len(a)):
-    #    for j in range(0,len(a[i])):
-    #
-
-        #    if a[i][j] == '"':
-        #        a[i].strip('"')
-
+    #rewards_level_description
+    #for i in range(1,len(rewards_level)+1):
+        #print i
+    #    a= '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
+    #    b = ']/div[2]/div[1]/p/text()'
+    #    c = str(i)
+        #print c
+    #    a += c
+    #    a += b
+        #print a
+    #    rewards_level_description_split_list=[]
+        #rewards_level_description_split_list = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/div[1]/p/text()')
+    #    rewards_level_description_split_list = sel.xpath(a)
+    #    rewards_level_description_split = rewards_level_description_split_list
+    #    rewards_level_description_split =''.join(rewards_level_description_split)
+    #    rewards_level_description.append(rewards_level_description_split)
+    #print rewards_level_description
+    #print len(rewards_level_description)
+    rewards_level_estimated_delivery = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/div[2]/div/span[2]/time/text()')
+    print rewards_level_estimated_delivery
+    #rewards_level_backers_number
+    rewards_level_backers_number =sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/div[3]//span[@class="pledge__backer-count"]/text()')
+    print rewards_level_backers_number
+    #pledge__limit
+    pledge_limit = []
+    #ship_location_info
+    ship_location_info = ['0']*9
+    for i in range(1,len(rewards_level)+1):
+        #print i
+        pledge_limit_a= '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
+        pledge_limit_b = ']/div[2]/div[3]//span[@class="pledge__limit"]/text()'
+        pledge_limit_c = str(i)
+        ship_location_info_a = '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
+        ship_location_info_b =']/div[2]/div[2]/div[2]/span[2]/text()'
+        ship_location_info_c = str(i)
+        #print c
+        pledge_limit_a += pledge_limit_c
+        pledge_limit_a += pledge_limit_b
+        ship_location_info_a += ship_location_info_c
+        ship_location_info_a += ship_location_info_b
+            #print a
+        pledge_limit_split_list=[]
+        ship_location_info_list=[]
+        pledge_limit_split_list = sel.xpath(pledge_limit_a)
+        pledge_limit_split = pledge_limit_split_list
+        pledge_limit_split =''.join(pledge_limit_split)
+        pledge_limit.append(pledge_limit_split)
+        ship_location_info_split_list = sel.xpath(ship_location_info_a)
+        ship_location_info_split = ship_location_info_split_list
+        #print ship_location_info_split, ship_location_info_split_list
+        ship_location_info_split =''.join(ship_location_info_split)
+        ship_location_info[i-1]= str(ship_location_info_split)
+    print 'pledge__limit:' , pledge_limit
+    print 'ship_location_info:' , ship_location_info
+    #a = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/div[2]/div[2]/span[2]')
     #print a
 
-
-
-    #for i in range(0,len(data_pool_url_websites)):
-    #    if data_pool_url_websites[i] <> '"':
-    #        data = data.append(data_pool_url_websites[i])
-    #print data
-    #data = ''.join(data_pool_url_websites.strip('"'))
-
-    #print data_pool_url_websites
-    #for '"' in data_pool_url_websites:
-
-    #data = data.strip('"')
-    #data = data.strip('project')
-
-
-
-    #print data_pool_url_websites
-
-
-
-    #creator_full_name = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[1]/span/span[2]/text()')
-
-
-
-
-
-    #print creator_buildhistory_has_built_projects_number1
-    #print creator_buildhistory_has_backed_projects_number1
-    #print 'creator_buildhistory_has_backed_projects_number:', creator_buildhistory_has_backed_projects_number1
-
-
+    #//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[7]/div[2]/div[3]/span
+    #//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[9]/div[2]/div[3]/span[3]
 
 
 

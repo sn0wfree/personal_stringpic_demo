@@ -91,6 +91,10 @@ else:
 
     #pledged_amount
     pledged_amount = sel.xpath('//*[@id="pledged"]/data/text()')
+    #data_percent_rasied
+    data_percent_rasied = sel.xpath('//*[@id="pledged"]/@data-percent-raised')
+    #data-currency
+    currency = sel.xpath('//*[@id="pledged"]/data/@data-currency')
 
     #data_poll_url
     data_pool_url = sel.xpath('//*[@id="stats"]/div/div[3]/div/div//@data-poll_url')
@@ -99,6 +103,8 @@ else:
     #setup_date = sel.xpath('')
     #hours_left
     hours_left = sel.xpath('//*[@id="project_duration_data"]//@data-hours-remaining')
+    #day_left
+    day_left = sel.xpath('//*[@id="stats"]/div/div[3]/div/div/div/text()')
     #data-duration
     data_duration = sel.xpath('//*[@id="project_duration_data"]//@data-duration')
 
@@ -109,53 +115,55 @@ else:
 
     #rewardsstructure
     #rewards
-    rewards_level = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/h2/span[1]/text()')
+    rewards_level_divided_by_goal = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/h2/span[1]/text()')
 
     #print rewards_level_name
     rewards_level_name = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/h3/text()')
+    rewards_backers_level_distribution =sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/div[3]/span/text()')
 
     #print rewards_level.spilt()
     #rewards_level_description
     #print len(rewards_level)
     #rewards_level_description
+    #initialation
     rewards_level_description =[]
-    for i in range(1,len(rewards_level)+1):
-        #print i
-        a= '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
-        b = ']/div[2]/div[1]/p/text()'
-        c = str(i)
-        #print c
-        a += c
-        a += b
-        #print a
-        rewards_level_description_split_list=[]
-        #rewards_level_description_split_list = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li[*]/div[2]/div[1]/p/text()')
-        rewards_level_description_split_list = sel.xpath(a)
-        rewards_level_description_split = rewards_level_description_split_list
-        rewards_level_description_split =''.join(rewards_level_description_split)
-        rewards_level_description.append(rewards_level_description_split)
-
-    #print len(rewards_level_description)
-
-    #pledge__limit
     pledge_limit = []
     #ship_location_info
-    ship_location_info = ['0']*9
-    for i in range(1,len(rewards_level)+1):
+    ship_location_info = ['0']*len(rewards_level_divided_by_goal)
+    #print len(rewards_level)
+    #rewards_level_description
+    #ship_info
+    #pledge_limit
+    for i in range(1,len(rewards_level_divided_by_goal)+1):
         #print i
+        c = str(i)
+        #rewards_level_description
+        rewards_level_description_a= '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
+        rewards_level_description_b = ']/div[2]/div[1]/p/text()'
+        #pledge_limit for each part of pledges
         pledge_limit_a= '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
         pledge_limit_b = ']/div[2]/div[3]//span[@class="pledge__limit"]/text()'
-        c = str(i)
+        #ship_info
         ship_location_info_a = '//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[2]/div[1]/div/ol/li['
         ship_location_info_b =']/div[2]/div[2]/div[2]/span[2]/text()'
-        #print c
+        #combin the xpath for each variable
         pledge_limit_a += c
         pledge_limit_a += pledge_limit_b
         ship_location_info_a += c
         ship_location_info_a += ship_location_info_b
-        #pledge_limit_info
+        rewards_level_description_a += c
+        rewards_level_description_a += rewards_level_description_b
+        #declare the empty list
+        rewards_level_description_split_list=[]
         pledge_limit_split_list=[]
         ship_location_info_list=[]
+        #split each variable
+        #rewards_level_description
+        rewards_level_description_split_list = sel.xpath(rewards_level_description_a)
+        rewards_level_description_split = rewards_level_description_split_list
+        rewards_level_description_split =''.join(rewards_level_description_split)
+        rewards_level_description.append(rewards_level_description_split)
+        #pledge_limit
         pledge_limit_split_list = sel.xpath(pledge_limit_a)
         pledge_limit_split = pledge_limit_split_list
         pledge_limit_split =''.join(pledge_limit_split)
@@ -168,15 +176,10 @@ else:
         ship_location_info_split= str(ship_location_info_split)
         #ship_location_info[i-1] = ship_location_info_split
 
-
-
-
-
     #deadline
     deadline_xpath= sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[1]/div/div/p/time/text()')
 
-
-    #description
+    #project_description
     description = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/p/text()')
 
 
@@ -243,33 +246,43 @@ else:
     #print 'value: %s' % dics.items()
 
     state = dics['state']
-
     pledged = dics ['pledged']
-
     state_changed_at = dics['statechangedat']
-
     comments_count = dics['commentscount']
-
-
     id = dics['id']
+
+
+    #data_structure_change
+    deadline_date= ''.join(deadline_xpath)
+    backers_count_str = ''.join(backers_count)
+    goal_str = ''.join(goal)
+    pledged_amount_str =''.join(pledged_amount)
+    currency_str = ''.join(currency)
+    data_percent_rasied_str = ''.join(data_percent_rasied)
+    hours_left_str = ''.join(hours_left)
 
 
 
     print 'project_name:', project_name
-    print 'location_id:',location_id
-    print 'project ID:', project_ID
-    print 'id :' ,id
+    print 'location_ID:', location_id
+    print 'Project ID:', project_ID
+    #print 'Project ID:', id
     print 'projetc_state:' , state
-
-    print 'deadline:',deadline_quot
-    print 'deadline_xpath:', ''.join(deadline_xpath)
     print 'created_at:',created_at
+    print 'Deadline:',deadline_quot
+    #print 'deadline_xpath:', deadline_date
     print 'state_changed_at:',state_changed_at
-    print 'backers_count:', ''.join(backers_count)
-    print 'backers_count:',  dics['backerscount']
-    print 'goal:',''.join(goal)
-    print 'pledged_amount',''.join(pledged_amount)
-    print 'pledged:', pledged
+
+    print 'backers count:', backers_count_str
+    #print 'backers_count:',  dics['backerscount']
+    print 'Goal:', goal_str
+    print 'pledged_amount',pledged_amount_str
+    #print 'pledged:', pledged
+    print 'data_percent_rasied:', data_percent_rasied_str
+    print 'currency:', currency_str
+    print 'hours_left:', hours_left_str
+    #print 'day_left:', day_left
+
 
     print 'description:',''.join(description)
     print 'creator_short_name:',''.join(creator_short_name)
@@ -287,34 +300,12 @@ else:
 
 
     #multi-data
-    print 'rewards_level:' ,rewards_level
+    print 'rewards_level_divided_by_goal:' ,rewards_level_divided_by_goal
     print 'rewards_level_name:' ,rewards_level_name
     print 'rewards_level_description:' ,rewards_level_description
-    print 'pledge__limit:' , pledge_limit
+    print 'rewards_backers_level_distribution:', rewards_backers_level_distribution
+    print 'pledge_limit:' , pledge_limit
+    #for i in range(0,len(rewards_level):
+    #    print rewards_level[i]
+
     #print 'ship_location_info:' , ship_location_info
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-     #print soup.prettify()

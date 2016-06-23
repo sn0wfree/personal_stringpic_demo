@@ -6,15 +6,7 @@ import opt
 import time
 import sys
 
-def progress_test():
-  bar_length=20
-  for percent in xrange(0, 100):
-    hashes = '#' * int(percent/100.0 * bar_length)
-    spaces = ' ' * (bar_length - len(hashes))
-    sys.stdout.write("\rPercent: [%s] %d%%"%(hashes + spaces, percent))
-    sys.stdout.flush()
-    time.sleep(1)
-progress_test()
+
 
 
 #urls = open("category.txt",'r').readlines()
@@ -43,12 +35,6 @@ class ThreadClass(threading.Thread):
             target = self.queue.get()
             x = generateallurl.discorurl(target)
             url1 = writeafile(x,file)
-            allurl=[]
-            if  url1 != [] :
-                lenurl1 = len(url1)
-                for j in xrange(0,lenurl1):
-                    allurl.append(url1)
-
             self.queue.task_done()
 
 

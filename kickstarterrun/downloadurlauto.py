@@ -10,7 +10,7 @@ import sys
 #urls = open("category.txt",'r').readlines()
 def firstset(x):
     a = generateallurl.seekurl(x,x+1,200)#oringal(1,54,200)11-54
-    file = open ('url%s.text' % x , 'a')
+    #file = open ('url%s.txt' % x , 'a')
     return (file,a)
 
 
@@ -20,7 +20,7 @@ count = 0
 #for i in xrange(0,len(urls)):
 #    file2.write(urls[i]+'\n')
 def writeafile(x,y):
-    #clean_list = list(set(x))
+    clean_list = (x)
     global count
     hashes = '#' * int(count)
     if clean_list != []:
@@ -42,6 +42,7 @@ class ThreadClass(threading.Thread):
             target = self.queue.get()
             x = generateallurl.discorurl(target)
             writeafile(x,file)
+
             #if  url1 != [] :
             #    lenurl1 = len(url1)
             #    for j in xrange(0,lenurl1):
@@ -60,7 +61,13 @@ def main():
             queue.put(url)
     queue.join()
 
+
 def downloadforurl(x):
     #i = int(input("Please enter an integer(1-54):"))
-    (file,urls) = firstset(x)
+    urls = open ('category2.txt','r').readlines()
+
+    global urls
+    file = open('allurlforkicktest1.txt','w')
+    #(file,urls) = firstset(x)
+
     main()

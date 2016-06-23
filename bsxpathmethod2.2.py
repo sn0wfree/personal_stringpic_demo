@@ -31,8 +31,6 @@ from twisted.enterprise import adbapi
 #someurl = 'https://www.kickstarter.com/projects/neliobarros/nixin-typeface?ref=discover_potd'
 someurl = 'https://www.kickstarter.com/projects/1060627644/35000-years-in-the-making-pens-made-from-ancient-k?ref=category_featured'
 
-
-
 def webscraper(someurl):
 
     root_url = 'https://www.kickstarter.com'
@@ -243,36 +241,36 @@ def webscraper(someurl):
     #data_structure_change
     deadline_date= ''.join(deadline_xpath)
     backers_count_str = ''.join(backers_count)
-    goal_str = ''.join(goal)
+    goal_str = goal
     pledged_amount_str =''.join(pledged_amount)
     currency_str = ''.join(currency)
     data_percent_rasied_str = ''.join(data_percent_rasied)
     hours_left_str = ''.join(hours_left)
 
     item = {}
-    level_rewards_by_goal={}
-    level_rewards_by_backers_distribution={}
-    level_rewards_by_pledge_limit={}
-    level_rewards_by_description={}
-    level_rewards_by_name={}
-    a=[]
+    #level_rewards_by_goal={}
+    #level_rewards_by_backers_distribution={}
+    #level_rewards_by_pledge_limit={}
+    #level_rewards_by_description={}
+    #level_rewards_by_name={}
+    #a=[]
 
     #obb = ['name','pledged','description','pledge_limit','backers_distribution']
-    for i in range(1,len(rewards_level_divided_by_goal)+1):
+    #for i in range(1,len(rewards_level_divided_by_goal)+1):
         #print i
-        a.append(i)
+    #    a.append(i)
     #print a
-    level_rewards_by_goal=dict(zip(a,rewards_level_divided_by_goal))
-    level_rewards_by_backers_distribution=dict(zip(a,rewards_backers_level_distribution))
-    level_rewards_by_pledge_limit=dict(zip(a,pledge_limit))
-    level_rewards_by_description=dict(zip(a,rewards_level_description))
-    level_rewards_by_name=dict(zip(a,rewards_level_name))
+    #level_rewards_by_goal=dict(zip(a,rewards_level_divided_by_goal))
+    #level_rewards_by_backers_distribution=dict(zip(a,rewards_backers_level_distribution))
+    #level_rewards_by_pledge_limit=dict(zip(a,pledge_limit))
+    #level_rewards_by_description=dict(zip(a,rewards_level_description))
+    #level_rewards_by_name=dict(zip(a,rewards_level_name))
     #print rewards
-    level_rewards_by_goal["project ID"]= project_ID_str
-    level_rewards_by_backers_distribution["project ID"]= project_ID_str
-    level_rewards_by_pledge_limit["project ID"]= project_ID_str
-    level_rewards_by_description["project ID"]= project_ID_str
-    level_rewards_by_name["project ID"]= project_ID_str
+    #level_rewards_by_goal["project ID"]= project_ID_str
+    #level_rewards_by_backers_distribution["project ID"]= project_ID_str
+    #level_rewards_by_pledge_limit["project ID"]= project_ID_str
+    #level_rewards_by_description["project ID"]= project_ID_str
+    #level_rewards_by_name["project ID"]= project_ID_str
     #for i in range(0,len(rewards_level_divided_by_goal)):
         #names['rewards_name_level%s' % 0 ] = ''
     #    names['rewards_name_level%s' % i] = rewards_level_name[i]
@@ -284,20 +282,20 @@ def webscraper(someurl):
     #retuen item
 
     item['project_name'] = project_name
-    item[ 'project_name']= project_name
+    #item[ 'project_name']= project_name
     item[ 'location_ID']= location_id
     item[ 'Project ID']= project_ID
     #print 'Project ID', id
     item[ 'projetc_state' ]= state
     item[ 'category']= category
-    item[ 'created_at']=created_at
+    item[ 'created_at']= created_at
     item[ 'Deadline']=deadline_quot
     #print 'deadline_xpath', deadline_date
     item[ 'state_changed_at']=state_changed_at
 
     item[ 'backers count']= backers_count_str
     #print 'backers_count',  dics['backerscount']
-    item[ 'Goal']= goal_str
+    item[ 'Goal']= goal_str[0]
     item[ 'pledged_amount']=pledged_amount_str
     #print 'pledged', pledged
     item[ 'data_percent_rasied']= data_percent_rasied_str
@@ -323,36 +321,45 @@ def webscraper(someurl):
 
     #multi-data
     rewards={}
-
-    rewards[ 'rewards_level_divided_by_goal' ]=retype(rewards_level_divided_by_goal)
-    rewards[ 'rewards_level_name' ]=retype(rewards_level_name)
-    rewards[ 'rewards_level_description' ]=retype(rewards_level_description)
+    rewards[ 'Project ID']= project_ID
+    rewards[ 'rewards_level_divided_by_goal' ]=rewards_level_divided_by_goal
+    rewards[ 'rewards_level_name' ]= rewards_level_name
+    rewards[ 'rewards_level_description' ]=rewards_level_description
     rewards[ 'rewards_backers_level_distribution']= rewards_backers_level_distribution
     rewards[ 'pledge_limit' ]= pledge_limit
     #for i in range(0,len(rewards_level)
     #    print rewards_level[i]
+    print type(description)
 
     #print 'ship_location_info' , ship_location_info
-    return item
+    return item,rewards
 
 
 #def rewards_backers_webscraper(someurl):
 #    x= webscraper(someurl)
 #    return level_rewards_by_backers_distribution
-try:
-      response = Request(someurl)
-      content = urllib2.urlopen(someurl).read()
-      sel= etree.HTML(content)
-      ##this is for some data without tab.
-      req = urlopen(response)
-      the_page1 = req.readlines()
-except URLError as e:
-    if hasattr(e, 'reason'):
-        print 'We failed to reach a server.'
-        print 'Reason: ', e.reason
-    elif hasattr(e, 'code'):
-        print 'The server couldn\'t fulfill the request.'
-        print 'Error code: ', e.code
-else:
-    kickstarter_projetc_data = webscraper(someurl)
-    print kickstarter_projetc_data
+def kickgowebscraper(someurl):
+    try:
+          response = Request(someurl)
+          content = urllib2.urlopen(someurl).read()
+          sel= etree.HTML(content)
+          ##this is for some data without tab.
+          req = urlopen(response)
+          the_page1 = req.readlines()
+    except URLError as e:
+        if hasattr(e, 'reason'):
+            print 'We failed to reach a server.'
+            print 'Reason: ', e.reason
+        elif hasattr(e, 'code'):
+            print 'The server couldn\'t fulfill the request.'
+            print 'Error code: ', e.code
+    else:
+            (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards) = webscraper(someurl)
+
+    return kickstarter_projetc_data_item,kickstarter_projetc_data_rewards
+
+
+
+(kickstarter_projetc_data_item,kickstarter_projetc_data_rewards)= kickgowebscraper(someurl)
+print kickstarter_projetc_data_rewards
+print kickstarter_projetc_data_item

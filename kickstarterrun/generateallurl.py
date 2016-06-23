@@ -18,7 +18,7 @@ def seekurl(n,x,y):
             for k in xrange(0, 4):
                 #pledged max 4
                 for j in xrange(0, y):#pages
-                    if l ==3 and k==3 and j>2 and not i in (7, 10 ,11, 12, 16 ,28, 30 ,31 ,35):
+                    if l ==3 and k==3 and j>40:
                         break
                     else:
                         if l==2 and k==2 and j>150 and not i in (7, 11, 14):
@@ -27,7 +27,7 @@ def seekurl(n,x,y):
                             if l ==1 and k==1 and j>150 and not i in (1,7, 11, 12, 14, 17, 18, 32):
                                 break
                             else:
-                                if l == 0 and k ==0 and j>150 and not i in (1, 11, 14, 18):
+                                if l == 0 and k ==0 and j>130 and not i in (1, 11, 14, 18):
                                     break
                                 else:
                                     if l==1 and k==3 and j>45 :
@@ -48,7 +48,23 @@ def seekurl(n,x,y):
                                                         if  l== 3 and k==2 and j >40:
                                                             break
                                                         else:
-                                                            url.append('https://www.kickstarter.com/discover/advanced?category_id='+ str(i) + '&pledged='+ str(k) + '&goal='+ str(l) + '&sort=newest&seed=2409590&page=' + str(j+1))
+                                                            if l==2 and k==1 and j>150 and not i in (7,11)  :
+                                                                break
+                                                            else:
+                                                                if k==0 and l==2 and j>150 and not i in (7, 9, 10, 11, 12, 14, 16, 18):
+                                                                    break
+
+                                                                else:
+                                                                    if k==2 and l==1 and j>95:
+                                                                        break
+                                                                    else:
+                                                                        if l==0 and k==2 and j>9:
+                                                                            break
+                                                                        else:
+                                                                            if k==1 and l==0 and j>97:
+                                                                                break
+                                                                            else:
+                                                                                url.append('https://www.kickstarter.com/discover/advanced?category_id='+ str(i) + '&pledged='+ str(k) + '&goal='+ str(l) + '&sort=newest&seed=2409590&page=' + str(j+1))
 
     return url
 

@@ -11,7 +11,7 @@ from twisted.enterprise import adbapi
 
 
 def inputdatabase(a,b):
-    
+
 
 class ThreadClass(threading.Thread):
     def __init__(self, queue):

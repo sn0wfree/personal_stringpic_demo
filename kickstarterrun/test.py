@@ -13,11 +13,11 @@ start = time.time()
 n=1
 x=54
 y=1
-l=3
-k=2
-j=40
+l=0
+k=1
+j=97
 url = []
-global wasd
+#global wasd
 
 alla =[]
 good =[]
@@ -34,7 +34,10 @@ for i in xrange(n, x):
         alla.append(q)
         #q = 'https://www.kickstarter.com/discover/advanced?category_id='+ str(i) + '&pledged='+ str(k) + '&goal='+ str(l) + '&sort=newest&seed=2409590&page=' + str(j+1)
                 #print type(q)
-                    #if i ==1-6,8,9 53and
+#category_urls = open ('category1.txt','r').readlines()
+#print len(category_urls)
+#allurl =   open ('allurlforkick.txt','r').readlines()
+#print len(allurl)                 #if i ==1-6,8,9 53and
 
 print len(alla)
 print 'when k= %s,l=%s,j = %s' %(k ,l, j)

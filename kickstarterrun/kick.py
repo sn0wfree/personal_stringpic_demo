@@ -4,15 +4,40 @@ from bs4 import BeautifulSoup
 import urllib2
 import requests
 from lxml import etree
+import downloadurlauto
 from twisted.enterprise import adbapi
 #import MySQLdb
 #import MySQLdb.cursors
 
 
+def inputdatabase(a,b):
+    
+
+class ThreadClass(threading.Thread):
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self.queue = queue
+    def run(self):
+        while 1:
+            target = self.queue.get()
+            x = webscraper(target)
+            inputdatabase(x,file)
+            self.queue.task_done()
 
 
+def main():
+
+    for j in xrange(4):
+        t = ThreadClass(queue)
+        t.setDaemon(True)
+        t.start()
+        for url in urls:
+            queue.put(url)
+    queue.join()
+
+main()
 #someurl = 'https://www.kickstarter.com/projects/neliobarros/nixin-typeface?ref=discover_potd'
-someurl = 'https://www.kickstarter.com/projects/1060627644/35000-years-in-the-making-pens-made-from-ancient-k?ref=category_featured'
+#someurl = 'https://www.kickstarter.com/projects/1060627644/35000-years-in-the-making-pens-made-from-ancient-k?ref=category_featured'
 
 
 

@@ -8,33 +8,40 @@ from twisted.enterprise import adbapi
 #import MySQLdb
 #import MySQLdb.cursors
 
-class FirstscrapyPipeline(object):
-    def __init__(self):
-        self.dbpool = adbapi.ConnectionPool('MySQLdb',
-                db = 'bookInfo',
-                user = 'root',
-                passwd = '123456',
-                cursorclass = MySQLdb.cursors.DictCursor,
-                charset = 'utf8',
-                use_unicode = False
-        )
-    def process_item(self, item, spider):
-        query = self.dbpool.runInteraction(self._conditional_insert, item)
-        return item
-
-     # insert the data to databases
-    def _conditional_insert(self, tx, item):
-        sql = "insert into book values (%s, %s)"
-        tx.execute(sql, (item["title"], item["link"]))
+#class FirstscrapyPipeline(object):
+#    def __init__(self):
+#        self.dbpool = adbapi.ConnectionPool('MySQLdb',
+#                db = 'bookInfo',
+#                user = 'root',
+#                passwd = '123456',
+#                cursorclass = MySQLdb.cursors.DictCursor,
+#                charset = 'utf8',
+#                use_unicode = False
+#        )
+#    def process_item(self, item, spider):
+#        query = self.dbpool.runInteraction(self._conditional_insert, item)
+#        return item
+#
+#     # insert the data to databases
+#    def _conditional_insert(self, tx, item):
+#        sql = "insert into book values (%s, %s)"
+#        tx.execute(sql, (item["title"], item["link"]))
 
 
 #someurl = 'https://www.kickstarter.com/projects/neliobarros/nixin-typeface?ref=discover_potd'
 someurl = 'https://www.kickstarter.com/projects/1060627644/35000-years-in-the-making-pens-made-from-ancient-k?ref=category_featured'
-root_url = 'https://www.kickstarter.com'
 
 
 
 def webscraper(someurl):
+
+    root_url = 'https://www.kickstarter.com'
+    response = Request(someurl)
+    content = urllib2.urlopen(someurl).read()
+    sel= etree.HTML(content)
+    ##this is for some data without tab.
+    req = urlopen(response)
+    the_page1 = req.readlines()
     def OnlyStr(s,oth=''):
        #s2 = s.lower();
        fomart = 'abcdefghijklmnopqrstuvwxyz0123456789:,'
@@ -329,9 +336,9 @@ def webscraper(someurl):
     return item
 
 
-def rewards_backers_webscraper(someurl):
-    x= webscraper(someurl)
-    return level_rewards_by_backers_distribution
+#def rewards_backers_webscraper(someurl):
+#    x= webscraper(someurl)
+#    return level_rewards_by_backers_distribution
 try:
       response = Request(someurl)
       content = urllib2.urlopen(someurl).read()
@@ -347,5 +354,5 @@ except URLError as e:
         print 'The server couldn\'t fulfill the request.'
         print 'Error code: ', e.code
 else:
-     kickstarter_projetc_data = webscraper(someurl)
-     print kickstarter_projetc_data
+    kickstarter_projetc_data = webscraper(someurl)
+    print kickstarter_projetc_data

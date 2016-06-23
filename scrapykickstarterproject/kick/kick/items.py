@@ -11,29 +11,36 @@ import scrapy
 class kickstarterItem(scrapy.Item):
     # define the fields for your item here like:
     #basic info.
-    name = scrapy.Field()
-    url = scrapy.Field()
-    id = scrapy.Field()
-    desription = scrapy.Field()
-    goal = scrapy.Field()
-    url = scrapy.Field()
-    creator_name = scrapy.Field()
-    creator_url = scrapy.Field()
-    #further info
-    
-    
-    backers_count = scrapy.Field()
+    project_name = scrapy.Field() 
+    location_ID  = scrapy.Field()
+    Project ID  = scrapy.Field()
+    projetc_state = scrapy.Field()
+    category  = scrapy.Field()
+    created_at = scrapy.Field()
+    Deadline = scrapy.Field()
+    state_changed_at = scrapy.Field()
+
+    backers count  = scrapy.Field()
+    Goal  = scrapy.Field()
     pledged_amount = scrapy.Field()
-    setupdate = scrapy.Field()
-    deadline = scrapy.Field()
-    rewards = scrapy.Field()
-    rewardsstructure = scrapy.Field()
-    updated_number = scrapy.Field()
-    commits_number = scrapy.Field()
-    delivery_date = scrapy.Field()
-    
-    
-    
-    
-    
+    data_percent_rasied = scrapy.Field()
+    currency = scrapy.Field()
+    hours_left = scrapy.Field()
+
+
+    description  = scrapy.Field()
+    creator_short_name = scrapy.Field()
+    creator_personal_url = scrapy.Field()
+    creator_bio_info_url = scrapy.Field()
+    creator_full_name = scrapy.Field()
+    creator_buildhistory_has_built_projects_number = scrapy.Field()
+    creator_buildhistory_has_backed_projects_number = scrapy.Field()
+    creator_friends__facebook_number = scrapy.Field()
+    creator_Facebook_url = scrapy.Field()
+    updates number = scrapy.Field()
+    comments_count  = scrapy.Field()
+
+
+
+
     pass

@@ -1,6 +1,6 @@
 
 from urllib2 import Request, urlopen, URLError
-
+import time
 import urllib2
 import requests
 from lxml import etree
@@ -9,10 +9,37 @@ from lxml import etree
 #import MySQLdb
 #import MySQLdb.cursors
 
+start = time.time()
 
 
 #someurl = 'https://www.kickstarter.com/projects/neliobarros/nixin-typeface?ref=discover_potd'
-#someurl = 'https://www.kickstarter.com/projects/1060627644/35000-years-in-the-making-pens-made-from-ancient-k?ref=category_featured'
+#someurl = 'https://www.kickstarter.com/projects/elijahkavana/action-deck-to-spark-your-journey?ref=category_newest'
+
+
+def kickgowebscraper(someurl):
+    #global category
+    #    x= webscraper(someurl)
+    #    return level_rewards_by_backers_distribution
+    try:
+          response = Request(someurl)
+          content = urllib2.urlopen(someurl).read()
+          sel= etree.HTML(content)
+          ##this is for some data without tab.
+          req = urlopen(response)
+          the_page1 = req.readlines()
+    except URLError as e:
+        if hasattr(e, 'reason'):
+            print 'We failed to reach a server.'
+            print 'Reason: ', e.reason
+            (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state) =(0,0,0,0)
+        elif hasattr(e, 'code'):
+            print 'The server couldn\'t fulfill the request.'
+            print 'Error code: ', e.code
+            (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state) =(0,0,0,0)
+    else:
+        (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state) = webscraper(someurl)
+    return kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state
+
 
 
 
@@ -91,6 +118,7 @@ def webscraper(someurl):
     goal = sel.xpath('//*[@id="stats"]/div/div[2]/span/span[1]/text()')
     #pledged_amount
     pledged_amount = sel.xpath('//*[@id="pledged"]/data/text()')
+
     #data_percent_rasied
     data_percent_rasied = sel.xpath('//*[@id="pledged"]/@data-percent-raised')
     #data-currency
@@ -193,6 +221,8 @@ def webscraper(someurl):
     creator_buildhistory_has_built_projects_number = "".join(built_projects_number_list).strip()
     creator_buildhistory_has_backed_projects_number = "".join(backed_projects_number_list).strip()
     #facebook information
+    state_other=sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[4]/div/h3/text()')
+
     creator_friends__facebook_number_potential = str(creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/text()'))
     if 'Not connected' in creator_friends__facebook_number_potential:
         creator_friends__facebook_number = 'Not connected'
@@ -206,23 +236,32 @@ def webscraper(someurl):
     #print data_pool_url
     #turn to new websites
     #new data form
-    data_pool_url_websites = urllib2.urlopen(data_pool_url).read()
-    data_pool_url_websites = ''.join(str(x) for x in data_pool_url_websites)
-    a = data_pool_url_websites#.split(',')
+    if data_pool_url  != '':
+        data_pool_url_websites = urllib2.urlopen(data_pool_url).read()
+        data_pool_url_websites = ''.join(str(x) for x in data_pool_url_websites)
+        a = data_pool_url_websites#.split(',')
+        name =[]
+        #transfor list to dictionary
+        b = OnlyStr(a).strip('project:')
+        for i in range(0,len(b.split(','))):
+            name.append(b.split(',')[i].split(':'))
+        dics = dict(name)
+        #print dics
+        #print 'value: %s' % dics.items()
+        state = dics['state']
+        pledged = dics ['pledged']
+        state_changed_at = dics['statechangedat']
+        comments_count = dics['commentscount']
+        id = dics['id']
+    else:
+        state = ''
+        pledged = ''
+        state_changed_at = ''
+        comments_count = ''
+        id = ''
+
     #print a
-    name =[]
-    #transfor list to dictionary
-    b = OnlyStr(a).strip('project:')
-    for i in range(0,len(b.split(','))):
-        name.append(b.split(',')[i].split(':'))
-    dics = dict(name)
-    #print dics
-    #print 'value: %s' % dics.items()
-    state = dics['state']
-    pledged = dics ['pledged']
-    state_changed_at = dics['statechangedat']
-    comments_count = dics['commentscount']
-    id = dics['id']
+
     #data_structure_change
     deadline_date= ''.join(deadline_xpath)
     backers_count_str = ''.join(backers_count)
@@ -266,18 +305,25 @@ def webscraper(someurl):
 
     #retuen item
 
+#pledged = ''
+#state_changed_at = ''
+#comments_count = ''
+#id = ''
     item['project_name'] = project_name
     #item[ 'project_name']= project_name
     item[ 'location_ID']= location_id
     item[ 'Project ID']= project_ID
     #print 'Project ID', id
-    item[ 'projetc_state' ]= state
-    item[ 'category']= category
-    item[ 'created_at']= created_at
-    item[ 'Deadline']=deadline_quot
-    #print 'deadline_xpath', deadline_date
-    item[ 'state_changed_at']=state_changed_at
+    if state != '':
+        item[ 'projetc_state' ]= state
+    else:
+        item[ 'projetc_state' ]=''.join(state_other)
 
+    item['category']= category
+    item['created_at']= created_at
+    item['Deadline']=deadline_quot
+    #print 'deadline_xpath', deadline_date
+    item['state_changed_at']=state_changed_at
     item[ 'backers count']= backers_count_str
     #print 'backers_count',  dics['backerscount']
     item[ 'Goal']= goal_str
@@ -319,34 +365,15 @@ def webscraper(someurl):
     return item, rewards , project_ID , state
 
 
-def kickgowebscraper(someurl):
-    #    x= webscraper(someurl)
-    #    return level_rewards_by_backers_distribution
-    try:
-          response = Request(someurl)
-          content = urllib2.urlopen(someurl).read()
-          sel= etree.HTML(content)
-          ##this is for some data without tab.
-          req = urlopen(response)
-          the_page1 = req.readlines()
-
-    except URLError as e:
-        if hasattr(e, 'reason'):
-            #print 'We failed to reach a server.'
-            #print 'Reason: ', e.reason
-            (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state) =(0,0,0,0)
-        elif hasattr(e, 'code'):
-            #print 'The server couldn\'t fulfill the request.'
-            #print 'Error code: ', e.code
-            (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state) =(0,0,0,0)
-    else:
-        (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state) = webscraper(someurl)
-    return kickstarter_projetc_data_item,kickstarter_projetc_data_rewards,ID,state
 
 
 
 #(a,b,c,d)=kickgowebscraper(someurl)
 #print a
+#
 #print a['Goal']
-#print c
+#print type(c)
+#
 #print d
+#end = time.time()
+#print end-start

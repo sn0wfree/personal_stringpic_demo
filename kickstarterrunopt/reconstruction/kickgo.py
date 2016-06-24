@@ -1,73 +1,14 @@
 import funcforkick
 import kickspider
-import downloadurl
+#import downloadurl
 import threading
 import Queue
 import datetime
 import time
 import sys
-import csv
-
-
-global index
-global total_item
-global total_rewards
 
 
 
-def csv_reader(file):
-    for key,val in csv.reader(open(file)):
-        dict[key] = val
-    return dict
-def csv_writer(dict,file,w):
-    csvwriter =csv.writer(open(file,"%s" %w))
-    for key,val in dict.items():
-        csvwriter.writerrow([key,val])
-    print 'saving process completed'
-
-
-def datagenerateprocess(url):
-    if url != '':
-        (item,rewards,id,state) = kickspider.kickgowebscraper(url)
-    else:
-        #print 'url is empty'
-        (item,rewards,id,state) =(0,0,0,0)
-    return item,rewards,id,state
-#construct opt index dic for list
-##read original index
-f = 'index.csv'
-#f_items = 'data.csv'
-#f_rewards = 'rewards.csv'
-index =csv_reader(f)
-total_item = open ('data.txt',a).readlins()
-
-total_rewards= open ('rewards.txt',a).readlins()
-#index = {}
-#total_item=[]
-#total_rewards=[]
-
-
-queue = Queue.Queue()
-class ThreadClass(threading.Thread):
-    def __init__(self, queue):
-        threading.Thread.__init__(self)
-        self.queue = queue
-    def run(self):
-        while 1:
-            target = self.queue.get()
-            (item,rewards,id,state)= datagenerateprocess(target)
-            (index,exist_code) = compareindexprocess(id,state,index)
-            if exist_code == 1:
-                total_item_part.append(item)
-                total_rewards_part.append(rewards)
-
-            #x = discorurl(target)
-            #file = open('allurlforkicktest.txt','a')
-            #writeafile(x,file)
-            #time.sleep(1/10)
-            self.queue.task_done()
-
-#a=1 means 'replicated projetcs'
 
 def main(url,core):
     a = len(url)
@@ -79,85 +20,83 @@ def main(url,core):
         queue.put(url[i])
     queue.join()
 
-def compareindexprocess(id,state,index):
-    a=1
-    if id != 0:
-        if  index.has_key(id) :
-            if index[id] =='live':
-                index.pop(id)
-                index[id]=state
-                a=1
-            else:
-                a = 0
-                #a=['replicated projetcs']
-        else:
-            #a=['replicated projetcs']
-            a = 1
-            index[id]=state
-    else:
-        a = 0
-    return index, a
 
 
 
+#construct opt index dic for list
+##read original index
+#f = 'index.csv'
+#f_items = 'data.csv'
+#f_rewards = 'rewards.csv'
+#index =csv_reader(f)
+queue = Queue.Queue()
+class ThreadClass(threading.Thread):
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self.queue = queue
+    def run(self):
+        while 1:
+            target = self.queue.get()
+            print 'begin collecting data'
+            (total_item,total_rewards)=funcforkick.basedprocess(target)
 
 
-def extend_result(x,y,a,b):
-    a.extend(x)
-    b.extend(y)
-    return a,b
+            #x = discorurl(target)
+            #file = open('allurlforkicktest.txt','a')
+            #writeafile(x,file)
+            #time.sleep(1/10)
+            self.queue.task_done()
+start = time.time()
+count = 0
+#global index
+global total_item
+global total_rewards
+print 'begin to creat index file'
+
+file_values ='index_value.txt'
+file_keys = 'index_keys.txt'
+
+
+index = funcforkick.index_read(file_keys,file_values)
+print 'begin to scrap'
+#total_item_lines = open ('data.txt','r').readlines()
+#total_rewards_lines= open ('rewards.txt','r').readlines()
+#index = {}
+total_item=[]
+total_rewards=[]
 
 #read projetc urls
 print 'begin reading urls file'
-file_unclear = open('allurlforkicktest.txt',r),readlines()
+file_unclear = open('allurlforkicktest.txt','r').readlines()
+print 'reading list completed'
 file =list(set(file_unclear))
+print len(file)
 lenfile200 = len(file)/200
 lenfile = len(file)
 print 'reading urls file completed'
 print 'begin to collecting data'
-for i in xrange(1,lenfile200+1):
-    total_item_part=[]
-    total_rewards_part=[]
-    if lenfile200 >1:
-        if i < lenfile200 :
-            for j in xrange((i-1)*200,i*200):
-                locals()['urls%s' %i].append(file[j])
-        else:
-            for j in xrange ((lenfile200-1)*200,lenfile):
-                locals()['urls%s' % lenfile200].append(file[j])
-    else:
-        for j in xrange(0,lenfile):
-            urls1.append(file[j])
-    main(locals()['urls%s' %i],3)
-    (total_item,total_rewards)= extend_result(total_item_part,total_rewards_part,total_item,total_rewards)
-    timesleep(1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#for i in xrange(1,lenfile200+1):
+#    if lenfile200 >1:
+#        if i < lenfile200 :
+#            for j in xrange((i-1)*200,i*200):
+#                locals()['urls%s' %i].append(file[j])
+#        else:
+#            for j in xrange ((lenfile200-1)*200,lenfile):
+#                locals()['urls%s' % lenfile200].append(file[j])
+#    else:
+#        for j in xrange(0,lenfile):
+#            urls1.append(file[j])
+#main(file ,3)
+count = 0
+for i in xrange(0,len(file)):
+    someurl=file[i]
+    (item,rewards,ID,state)= kickspider.kickgowebscraper(someurl)
+    total_item.append(item)
+    total_rewards.append(rewards)
+    time.sleep(1)
+    sys.stdout.write("\rthis spider has already collected %d project" % count)
+    count = count + 1
+    sys.stdout.flush()
 
 
 
@@ -173,25 +112,23 @@ for i in xrange(1,lenfile200+1):
 #index_dict = dict(index)
 
 
+#total_item.close()
+#total_rewards.close()
+
+#lentotal_item = len(total_item)
+#lentotal_rewards = len(total_rewards)
+#for i in xrange(0,lentotal_item):
+#    total_item.write(total_item[i]+'\n')
+#    total_rewards.write(total_rewards[i]+'\n')
 
 
 
 
 
+#csv_writer(index,f,w)
 
-total_item.close()
-total_rewards.close()
-
-lentotal_item = len(total_item)
-lentotal_rewards = len(total_rewards)
-for i in xrange(0,lentotal_item):
-    total_item.write(total_item[i]+'\n')
-    total_rewards.write(total_rewards[i]+'\n')
-
-
-
-
-
-csv_writer(index,f,w)
+funcforkick.index_write(index,file_keys,file_values)
 #csv_writer(total_item,f_items,a)
 #csv_writer(total_rewards,f_rewards,a)
+end = time.time()
+print end-start

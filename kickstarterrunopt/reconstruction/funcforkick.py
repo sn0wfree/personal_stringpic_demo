@@ -9,6 +9,7 @@ from lxml import etree
 import pickle
 from urllib2 import Request, urlopen, URLError
 import os
+import kickspider
 
 
 #generate category url
@@ -85,10 +86,89 @@ def writeafile(x,y):
         if clean_list[i] != '':
             #print clean_list[i]
             y.write(clean_list[i]+'\n')
-            sys.stdout.write("\rthis spider has alread written %d urls" % count)
+            sys.stdout.write("\rthis spider has already written %d urls/project" % count)
             count = count + 1
             sys.stdout.flush()
 
+def index_read(file_keys,file_values):
+    f_keys=open(file_keys,'r')
+    f_value=open(file_values,'r')
+
+    f_keys_reads=f_keys.readlines()
+    f_value_reads=f_value.readlines()
+    for f_keys_read in f_keys_reads:
+        f_keys_r = f_keys_read.split(';')
+    for f_value_read in f_value_reads:
+        f_value_r = f_value_read.split(';')
+
+
+    if f_keys_r[-1] == ''   :
+        f_keys_r.pop()
+    if f_value_r[-1] ==''  :
+        f_value_r.pop()
+    lenindex_key =  len(f_keys_r)
+    index={}
+    for i in xrange(0,lenindex_key):
+        index[f_keys_r[i]]=f_value_r[i]
+    f_keys.close()
+    f_value.close()
+    print 'reading index completed'
+    return index
+
+
+def index_write(index,file_keys,file_values):
+    f_keys=open(file_keys,'w')
+    f_value=open(file_values,'w')
+    index_keys = list(index)
+    a=len(index_keys)
+    index_value=[]
+    for i in xrange(0,a):
+        b= index_keys[i]
+        index_value.append(index[b])
+    for i in xrange(0,a):
+        f_keys.write(str(index_keys[i])+';')
+        f_value.write(str(index_value[i])+';')
+    f_keys.close()
+    f_value.close()
+    print 'saving process completed'
+
+
+
+def compareindexprocess(id,state,index):
+    a=1
+    if id != 0:
+        if  index.has_key(id) :
+            if index[id] =='live':
+                index.pop(id)
+                index[id]=state
+                a=1
+            else:
+                a = 0
+                #a=['replicated projetcs']
+        else:
+            #a=['replicated projetcs']
+            a = 1
+            index[id]=state
+    else:
+        a = 0
+    return index, a
+
+def datagenerateprocess(url):
+    if url != '':
+        (item,rewards,id,state) = kickspider.kickgowebscraper(url)
+    else:
+        #print 'url is empty'
+        (item,rewards,id,state) =(0,0,0,0)
+    print 'data generate process completed'
+    return item,rewards,id,state
+
+
+
+
+def extend_result(x,y,a,b):
+    a.extend(x)
+    b.extend(y)
+    return a,b
 
 
 
@@ -245,7 +325,17 @@ def main(x,y):
         queue.put(x[i])
     queue.join()
 
-
+def basedprocess(target):
+    (item,rewards,id,state)= datagenerateprocess(target)
+    (index,exist_code) = compareindexprocess(id,state,index)
+    print item,rewards
+    total_item_part=[]
+    total_rewards_part=[]
+    if exist_code == 1:
+        total_item_part.append(item)
+        total_rewards_part.append(rewards)
+    (total_item,total_rewards)= extend_result(total_item_part,total_rewards_part,total_item,total_rewards)
+    return total_item,total_rewards
 
 
 def downloadforurl(x,y):

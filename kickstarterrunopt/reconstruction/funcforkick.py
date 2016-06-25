@@ -1,5 +1,6 @@
 import threading
 import Queue
+import kickspider
 import datetime
 import time
 import sys
@@ -102,10 +103,16 @@ def index_read(file_keys,file_values):
         f_value_r = f_value_read.split(';')
 
 
-    if f_keys_r[-1] == ''   :
-        f_keys_r.pop()
-    if f_value_r[-1] ==''  :
-        f_value_r.pop()
+    if f_keys_reads != []:
+        if f_keys_r[-1] == ''  :
+            f_keys_r.pop()
+        if f_value_r[-1] ==''  :
+            f_value_r.pop()
+    else:
+        f_keys_r=[]
+        f_value_r=[]
+
+
     lenindex_key =  len(f_keys_r)
     index={}
     for i in xrange(0,lenindex_key):
@@ -135,31 +142,40 @@ def index_write(index,file_keys,file_values):
 
 
 def compareindexprocess(id,state,index):
-    a=1
-    if id != 0:
-        if  index.has_key(id) :
-            if index[id] =='live':
-                index.pop(id)
-                index[id]=state
-                a=1
-            else:
-                a = 0
-                #a=['replicated projetcs']
-        else:
-            #a=['replicated projetcs']
-            a = 1
+
+    if  index.has_key(id) :
+        if index[id] =='live':
+            index.pop(id)
             index[id]=state
+            a=1
+            state_code=2
+            #total_item.append(item)
+            #total_rewards.append(rewards)
+        else:
+            a=0
+            state_code=3
+            #a=['replicated projetcs']
     else:
-        a = 0
-    return index, a
+            #a=['replicated projetcs']
+        index[id]=state
+        state_code=1
+        #total_item.append(item)
+        #total_rewards.append(rewards)
+        a=1
+
+    return a,index,state_code
 
 def datagenerateprocess(url):
     if url != '':
-        (item,rewards,id,state) = kickspider.kickgowebscraper(url)
+        (item,rewards,id,state) = opt(url)
     else:
         #print 'url is empty'
-        (item,rewards,id,state) =(0,0,0,0)
-    print 'data generate process completed'
+        item ={}
+        rewards={}
+        id=0
+        state='='
+    #print '\ndata generate process completed'
+
     return item,rewards,id,state
 
 
@@ -208,50 +224,15 @@ def progress_test():
 
 
 def opt(someurl):
-    #global item
-    root_url = 'https://www.kickstarter.com'
-    try:
-          response = Request(someurl)
-          content = urllib2.urlopen(someurl).read()
-          sel= etree.HTML(content)
-          ##this is for some data without tab.
-          req = urlopen(response)
-          the_page1 = req.readlines()
-    except URLError as e:
-        if hasattr(e, 'reason'):
-            print 'We failed to reach a server.'
-            print 'Reason: ', e.reason
-            item = {}
-
-        elif hasattr(e, 'code'):
-            print 'The server couldn\'t fulfill the request.'
-            print 'Error code: ', e.code
-            item = {}
-    else:
-        for line in the_page1:
-            if 'data'  in line:
-                words = line.split('" ')
-                for word in words:
-                    if 'data class="Project' in word:
-                        project_ID_str = word.split('Project')[1]
-        project_ID = ''.join(project_ID_str)
-        data_pool_url = sel.xpath('//*[@id="stats"]/div/div[3]/div/div//@data-poll_url')
-        data_pool_url = sel.xpath('//*[@id="stats"]/div/div[3]/div/div//@data-poll_url')
-        data_pool_url = ''.join(str(x) for x in data_pool_url)
-        data_pool_url_websites = urllib2.urlopen(data_pool_url).read()
-        data_pool_url_websites = ''.join(str(x) for x in data_pool_url_websites)
-        a = data_pool_url_websites#.split(',')
-        #print a
-        name =[]
-        #transfor list to dictionary
-        b = OnlyStr(a).strip('project:')
-        for i in range(0,len(b.split(','))):
-            name.append(b.split(',')[i].split(':'))
-        dics = dict(name)
-        state = dics['state']
-        item[ 'Project ID']= project_ID
-        item[ 'projetc_state' ]= state
-    return item
+    line = someurl
+    if '/projects/'  in line:
+        word4 = line.split('/')[4]
+        if 'abcdefghijklmnopqrstuvwxyz' in word4:
+            print 'non live projects'
+            (a,b,c,d)=kickspider.webscraper_nonlive(someurl)
+        else:
+            (a,b,c,d)=kickspider.webscraper_live(someurl)
+    return (a,b,c,d)
 
 def OnlyStr(s,oth=''):
    #s2 = s.lower();
@@ -325,17 +306,8 @@ def main(x,y):
         queue.put(x[i])
     queue.join()
 
-def basedprocess(target):
-    (item,rewards,id,state)= datagenerateprocess(target)
-    (index,exist_code) = compareindexprocess(id,state,index)
-    print item,rewards
-    total_item_part=[]
-    total_rewards_part=[]
-    if exist_code == 1:
-        total_item_part.append(item)
-        total_rewards_part.append(rewards)
-    (total_item,total_rewards)= extend_result(total_item_part,total_rewards_part,total_item,total_rewards)
-    return total_item,total_rewards
+
+
 
 
 def downloadforurl(x,y):

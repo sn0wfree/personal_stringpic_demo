@@ -88,28 +88,30 @@ updated=0
 repeated=0
 for i in xrange(0,lenfile):
     someurl=file[i]
-    (item,rewards,ID,state)= funcforkick.datagenerateprocess(someurl)
+    if someurl !='':
+        (item,rewards,ID,state)= funcforkick.datagenerateprocess(someurl)
 
-    (exist_code,index,state_code) = funcforkick.compareindexprocess(ID,state,index)
-    #1:new_add
-    #2:updated
-    #3:repeated
-    if state_code != 1:
-        if state_code !=2:
-            repeated +=1
+        (exist_code,index,state_code) = funcforkick.compareindexprocess(ID,state,index)
+        #1:new_add
+        #2:updated
+        #3:repeated
+        if state_code != 1:
+            if state_code !=2:
+                repeated +=1
+            else:
+                updated+=1
         else:
-            updated+=1
-    else:
-        new_add+=1
+            new_add+=1
 
-    #print item,rewards
-    if exist_code != 0:
-        total_item.append(item)
-        total_rewards.append(rewards)
-        counts = counts + 1
-    sys.stdout.write("\rthis spider has already read %d projects and %d new add, %d updated, %d repeated" % (counts,new_add,updated,repeated))
-    sys.stdout.flush()
-    time.sleep(1)
+        #print item,rewards
+        if exist_code != 0:
+            total_item.append(item)
+            total_rewards.append(rewards)
+            counts = counts + 1
+        sys.stdout.write("\rthis spider has already read %d projects and %d new add, %d updated, %d repeated" % (counts,new_add,updated,repeated))
+        sys.stdout.flush()
+        time.sleep(1)
+
 
 
 
@@ -134,7 +136,7 @@ for i in xrange(0,lenfile):
 #for i in xrange(0,lentotal_item):
 #    total_item.write(total_item[i]+'\n')
 #    total_rewards.write(total_rewards[i]+'\n')
-print '\n',total_item
+#print '\n',total_item
 #csv_writer(index,f,w)
 print '\n the len of total_item :' , len(total_item)
 funcforkick.index_write(index,'index_value.txt','index_keys.txt')

@@ -224,15 +224,52 @@ def progress_test():
 
 
 def opt(someurl):
-    line = someurl
-    if '/projects/'  in line:
-        word4 = line.split('/')[4]
-        if 'abcdefghijklmnopqrstuvwxyz' in word4:
-            print 'non live projects'
-            (a,b,c,d)=kickspider.webscraper_nonlive(someurl)
-        else:
+    #line = someurl
+    #kicktraqrool_url = 'http://www.kicktraq.com/'
+    state =[]
+    #if 'https://www.kickstarter.com/'  in line:
+    #    data_collect_tool_halfurl = line.split('https://www.kickstarter.com/')[1]
+        #print type(data_collect_tool_halfurl)
+    #    data_collect_tool_url = kicktraqrool_url + data_collect_tool_halfurl
+    try:
+          response = Request(someurl)
+          content = urllib2.urlopen(someurl).read()
+          sel= etree.HTML(content)
+          ##this is for some data without tab.
+          #req = urlopen(response)
+          #the_page1 = req.readlines()
+    except URLError as e:
+        if hasattr(e, 'reason'):
+            print 'We failed to reach a server.'
+            print 'Reason: ', e.reason
+            a={}
+            b={}
+            c=0
+            d=''
+        elif hasattr(e, 'code'):
+            print 'The server couldn\'t fulfill the request.'
+            print 'Error code: ', e.code
+            a={}
+            b={}
+            c=0
+            d=''
+    else:
+        state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
+        if state == 'live':
             (a,b,c,d)=kickspider.webscraper_live(someurl)
+        else:
+            if state == 'successful':
+                (a,b,c,d) = kickspider.webscraper_successed(someurl)
+            else:
+                (a,b,c,d)= kickspider.webscraper_failorcanceled(someurl)
+                #suspended
+            #print 'non live projects'
+            #(a,b,c,d)=kickspider.webscraper_failorcanceled(someurl)
+
+        #else:
+
     return (a,b,c,d)
+    #return state
 
 def OnlyStr(s,oth=''):
    #s2 = s.lower();

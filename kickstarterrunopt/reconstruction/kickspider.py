@@ -4,7 +4,7 @@ import time
 import urllib2
 import requests
 from lxml import etree
-
+#import funcforkick
 
 #import MySQLdb
 #import MySQLdb.cursors
@@ -21,7 +21,14 @@ def retype(x):
     x_new = ''.join(x)
     return x_new
 
-#start = time.time()
+def listleftn(l):
+    lenlists =len(l)
+    for i in xrange(0,lenlists):
+        l[i]=l[i].strip('\n')
+    return l
+
+
+
 
 def webscraper_live(someurl):
     root_url = 'https://www.kickstarter.com'
@@ -93,7 +100,8 @@ def webscraper_live(someurl):
         created_at=''.join(created_at_str)
         #state_changed_at=''.join(state_changed_at_str)
         deadline_quot=''.join(deadline_quot_str)
-        video = sel.xpath('//*[@id="video-section"]')
+        video = sel.xpath('//*[@id="video-section"]/@data-has-video')
+        #print video
         #backers_count
         backers_count= sel.xpath('//*[@id="backers_count"]/data/text()')
         #goal
@@ -259,7 +267,7 @@ def webscraper_live(someurl):
         item['project_name'] = project_name
         #item[ 'project_name']= project_name
         item[ 'location_ID']= location_id
-        item[ 'Project ID']= project_ID
+        item[ 'Project_ID']= project_ID
         #print 'Project ID', id
         if state != '':
             item[ 'project_state' ]= state
@@ -269,7 +277,7 @@ def webscraper_live(someurl):
         item['Deadline']=deadline_quot
         #print 'deadline_xpath', deadline_date
         item['state_changed_at']=state_changed_at
-        item[ 'backers count']= backers_count_str
+        item[ 'backers_count']= backers_count_str
         #print 'backers_count',  dics['backerscount']
         item[ 'Goal']= goal_str
         item[ 'pledged_amount']=pledged_amount_str
@@ -278,7 +286,7 @@ def webscraper_live(someurl):
         item[ 'currency']= currency_str
         item[ 'hours_left']= hours_left_str
         #print 'day_left', day_left
-        item['has_a_video'] =video
+        item['has_a_video'] =''.join(video)
         item[ 'description']=''.join(description).strip('\n')
         item[ 'creator_short_name']=''.join(creator_short_name)
         item[ 'creator_personal_url']=''.join(creator_personal_url)
@@ -288,28 +296,20 @@ def webscraper_live(someurl):
         item[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
         item[ 'creator_friends__facebook_number' ]=''.join(creator_friends__facebook_number)
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
-        item[ 'updates number']=''.join(updates)
+        item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count
-        item['duration'] =data_duration
+        item['duration'] =''.join(data_duration)
         #multi-data
         rewards={}
 
-        rewards[ 'Project ID']= project_ID
+        rewards[ 'Project_ID']= project_ID
         rewards[ 'rewards_level_divided_by_goal' ]=rewards_level_divided_by_goal
         rewards[ 'rewards_level_name' ]= listleftn(rewards_level_name)
         rewards[ 'rewards_level_description' ]=rewards_level_description
         rewards[ 'rewards_backers_level_distribution']= rewards_backers_level_distribution
         rewards[ 'pledge_limit' ]= listleftn(pledge_limit)
         item['category']= category
-    return item, rewards , item[ 'Project ID'] , item['project_state']
-
-def listleftn(l):
-    lenlists =len(l)
-    for i in xrange(0,lenlists):
-        l[i]=l[i].strip('\n')
-    return l
-
-
+    return item, rewards , item[ 'Project_ID'] , item['project_state']
 
 
 def webscraper_failorcanceled(someurl):
@@ -395,7 +395,7 @@ def webscraper_failorcanceled(someurl):
         #setup date
         #setup_date = sel.xpath('')
         #hours_left
-        video = sel.xpath('//*[@id="video-section"]')
+        video = sel.xpath('//*[@id="video-section"]/@data-has-video')
         #backers_count
         hours_left = sel.xpath('//*[@id="project_duration_data"]//@data-hours-remaining')
         #day_left
@@ -483,7 +483,7 @@ def webscraper_failorcanceled(someurl):
         creator_full_name = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[1]/span/span[2]/text()')
         #creator_buildhistory
                              #//*[@id="bio"]/div/div[2]/div[4]/text()[2]
-        creator_buildhistory_has_backed_projects_number = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/div[2]/div[2]/p/span[2]/span/text()')[0]
+        creator_buildhistory_has_backed_projects_number = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/div[2]/div[2]/p/span[2]/span/text()')
         creator_buildhistory_has_built_projects_number = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/a/text()')
         built_projects_number_list = creator_buildhistory_has_built_projects_number
         backed_projects_number_list = creator_buildhistory_has_backed_projects_number
@@ -530,7 +530,7 @@ def webscraper_failorcanceled(someurl):
             #print 'value: %s' % dics.items()
             #state = dics['state']
             pledged = dics ['pledged']
-            state_changed_at = dics['statechangedat']
+            #state_changed_at = dics['statechangedat']
             comments_count = dics['commentscount']
             id = dics['id']
         else:
@@ -540,7 +540,11 @@ def webscraper_failorcanceled(someurl):
             comments_count = 0
             id = 0
         #data_structure_change
+         #                            //*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[5]/div/p/data
+        state_changed_at_str = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[*]/div/p/data/@data-value')
+        state_changed_at = ''.join(state_changed_at_str).strip('"')
 
+        #print state_changed_at
         deadline_date= ''.join(deadline_xpath)
         backers_count_str = ''.join(backers_count)
         goal_str = ''.join(goal)
@@ -553,12 +557,12 @@ def webscraper_failorcanceled(someurl):
         #state_changed_at = ''
         #comments_count = ''
         #id = ''
-        item['has_a_video']= video
+        item['has_a_video']= ''.join(video)
         item['project_name'] = project_name
         #item[ 'project_name']= project_name
         item[ 'location_ID']= location_id
-        item[ 'Project ID']= project_ID
-        item['duration'] =data_duration
+        item[ 'Project_ID']= project_ID
+        item['duration'] =''.join(data_duration)
         state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
 
         #print 'Project ID', id
@@ -571,8 +575,8 @@ def webscraper_failorcanceled(someurl):
         item['created_at']= created_at
         item['Deadline']=deadline_quot
         #print 'deadline_xpath', deadline_date
-        item['state_changed_at']= sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[4]/div/p/data/@data-value')
-        item[ 'backers count']= backers_count_str
+        item['state_changed_at']= state_changed_at
+        item[ 'backers_count']= backers_count_str
         #print 'backers_count',  dics['backerscount']
         item[ 'Goal']= goal_str
         item[ 'pledged_amount']=pledged_amount_str
@@ -590,19 +594,19 @@ def webscraper_failorcanceled(someurl):
         item[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
         item[ 'creator_friends__facebook_number' ]=''.join(creator_friends__facebook_number)
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
-        item[ 'updates number']=''.join(updates)
+        item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count
         #multi-data
         rewards={}
 
-        rewards[ 'Project ID']= project_ID
+        rewards[ 'Project_ID']= project_ID
         rewards[ 'rewards_level_divided_by_goal' ]=rewards_level_divided_by_goal
         rewards[ 'rewards_level_name' ]= listleftn(rewards_level_name)
         rewards[ 'rewards_level_description' ]=rewards_level_description
         rewards[ 'rewards_backers_level_distribution']= rewards_backers_level_distribution
         rewards[ 'pledge_limit' ]= listleftn(pledge_limit)
         item['category']= category
-    return item, rewards , item[ 'Project ID'] , item['project_state']
+    return item, rewards , item[ 'Project_ID'] , item['project_state']
 
 
 def webscraper_successed(someurl):
@@ -708,7 +712,8 @@ def webscraper_successed(someurl):
         #setup date
         #setup_date = sel.xpath('')
         #hours_left
-        video = sel.xpath('//*[@id="video-section"]')
+        video = sel.xpath('//*[@id="video-section"]/@data-has-video')
+        #print video
         #backers_count
         hours_left = sel_description.xpath('//*[@id="project_duration_data"]//@data-hours-remaining')
         #day_left
@@ -799,26 +804,25 @@ def webscraper_successed(someurl):
         creator_personal_url = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[1]/div[2]/ul/li/a/@href')
         ccccc=creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]//text()')
         #print ccccc
-
+        creator_buildhistory_has_built_projects_number=''
+        creator_buildhistory_has_backed_projects_number=''
         for word in ccccc:
             if word != '\n':
                 if 'created' in word:
                     creator_buildhistory_has_built_projects_number = word.strip()
                 else:
-                    if 'backed' in word:
-                        creator_buildhistory_has_backed_projects_number =word.strip()
+                    creator_buildhistory_has_built_projects_number=''
+                if 'backed' in word:
+                    creator_buildhistory_has_backed_projects_number =word.strip()
+                else:
+                    creator_buildhistory_has_backed_projects_number=''
 
 
 
-        #print creator_buildhistory_has_built_projects_number    ,creator_buildhistory_has_backed_projects_number                                             #//*[@id="bio"]/div/div[2]/div[4]/a
-        #creator_buildhistory_has_backed_projects_number = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/a/text()')
-                                                                                    #//*[@id="bio"]/div/div[2]/div[4]/text()
-        #creator_buildhistory_has_built_projects_number = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/text()')
-        #built_projects_number_list = creator_buildhistory_has_built_projects_number
-        #backed_projects_number_list = creator_buildhistory_has_backed_projects_number
-        #creator_buildhistory_has_built_projects_number = "".join(built_projects_number_list).strip()
-        #creator_buildhistory_has_backed_projects_number = "".join(backed_projects_number_list).strip()
-        #facebook information
+
+
+
+
         creator_friends__facebook_number_potential_list = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[2]/text()')
 
         creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
@@ -877,9 +881,9 @@ def webscraper_successed(someurl):
         item['project_name'] = project_name
         #item[ 'project_name']= project_name
         item[ 'location_ID']= location_id
-        item[ 'Project ID']= project_ID
+        item[ 'Project_ID']= project_ID
         item['duration'] =data_duration
-        item['has_a_video'] =video
+        item['has_a_video'] =''.join(video)
         #print 'Project ID', id
         state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
 
@@ -895,7 +899,7 @@ def webscraper_successed(someurl):
         item['Deadline']=deadline_quot
         #print 'deadline_xpath', deadline_date
         item['state_changed_at']=state_changed_at
-        item[ 'backers count']= backers_count_str
+        item[ 'backers_count']= backers_count_str
         #print 'backers_count',  dics['backerscount']
         item[ 'Goal']= goal_str
         item[ 'pledged_amount']=pledged_amount_str
@@ -913,19 +917,19 @@ def webscraper_successed(someurl):
         item[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
         item[ 'creator_friends__facebook_number' ]=''.join(creator_friends__facebook_number)
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
-        item[ 'updates number']=''.join(updates)
+        item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count
         #multi-data
         rewards={}
 
-        rewards[ 'Project ID']= project_ID
+        rewards[ 'Project_ID']= project_ID
         rewards[ 'rewards_level_divided_by_goal' ]=rewards_level_divided_by_goal
         rewards[ 'rewards_level_name' ]= listleftn(rewards_level_name)
         rewards[ 'rewards_level_description' ]=rewards_level_description
         rewards[ 'rewards_backers_level_distribution']= rewards_backers_level_distribution
         rewards[ 'pledge_limit' ]= listleftn(pledge_limit)
         item['category']= ''.join(category).strip('\n')
-    return item, rewards , item[ 'Project ID'] , item['project_state']
+    return item, rewards , item[ 'Project_ID'] , item['project_state']
 
 
 
@@ -936,9 +940,10 @@ def webscraper_successed(someurl):
 #someurl = 'https://www.kickstarter.com/projects/usagraphicsfest/usa-graphic-design-festival?ref=category_newest'
 #for unseccessful
 #someurl='https://www.kickstarter.com/projects/captainblacksbbq/captain-blacks-barbecue?ref=category_newest'
-
+#someurl ='https://www.kickstarter.com/projects/1708738346/the-searzall'
 #(a,b,c,d)=webscraper_live(someurl)
-#(a,b,c,d)=webscraper_nonlive(someurl)
+#(a,b,c,d)=webscraper_failorcanceled(someurl)
+#(a,b,c,d)=webscraper_successed(someurl)
 #print a
 #print b
 #print a['Goal']
@@ -947,6 +952,3 @@ def webscraper_successed(someurl):
 #print d
 #end = time.time()
 #print end-start
-#a=['\n1212\n','\n2121212\n']
-#b = listleftn(a)
-#print b

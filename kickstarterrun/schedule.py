@@ -5,19 +5,26 @@ import generateallurl
 import opt
 import time
 import sys
-import kick
 
 import downloadurlauto
 def __init__(self, queue):
     threading.Thread.__init__(self)
     self.queue = queue
-print 'initiating collecting data'
-category_urls = open ('category2.txt','r').readline()
+
+def progress_test():
+  bar_length=30
+  for percent in xrange(0, 100):
+    hashes = '#' * int(percent/100.0 * bar_length)
+    spaces = ' ' * (bar_length - len(hashes))
+    sys.stdout.write("\rPercent: [%s] %d%%"%(hashes + spaces, percent))
+    sys.stdout.flush()
+    time.sleep(1)
 
 
 
 for i in xrange(1,54):
-    downloadurlauto,downloadforurl(i)
+    print 'initiating collecting data'
+    downloadurlauto.downloadforurl(i)
     #print 'project %d has succesful porcess and do next' % i
-    time.sleep(100)
+    #progress_test()
     #print '%d have succesful porcess and do next' % i

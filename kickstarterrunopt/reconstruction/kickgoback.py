@@ -8,6 +8,62 @@ import time
 import sys
 
 
+
+
+
+
+db = MySQLdb.connect('localhost','root','19920815','kickdatafortest');
+
+cur=db.cursor()
+
+cur.execute("CREATE TABLE IF NOT EXISTS \
+        Project (Project_ID INT PRIMARY KEY NOT NULL,
+                 project_name VARCHAR(100) NOT NULL,
+                 location_ID VARCHAR(30) NOT NULL,
+                 duration INT,
+                 has_a_video VARCHAR(10),
+                 project_state VARCHAR(10),
+                 created_at INT,
+                 Deadline INT,
+                 state_changed_at VARCHAR(30),
+                 backers_count VARCHAR(30),
+                 Goal VARCHAR(30),
+                 pledged_amount VARCHAR(30),
+                 data_percent_rasied VARCHAR(5),
+                 currency VARCHAR(10),
+                 hours_left VARCHAR(30),
+                 description VARCHAR(100),
+                 creator_short_name VARCHAR(30),
+                 creator_personal_url VARCHAR(1000),
+                 creator_bio_info_url VARCHAR(100),
+                 creator_full_name VARCHAR(30),
+                 creator_buildhistory_has_built_projects_number VARCHAR(20),
+                 creator_buildhistory_has_backed_projects_number VARCHAR(20),
+                 creator_friends__facebook_number VARCHAR(20),
+                 creator_Facebook_url VARCHAR(20),
+                 updates_number VARCHAR(20),
+                 comments_count VARCHAR(1000),
+                 category VARCHAR(30),
+                 )")
+
+
+
+
+
+def conditional_insert(cursor, item):
+    listitem = list(item)
+    sql = "insert into  (%s)\ values('%s') "
+    for x in listitem:
+        cursor.execute(sql, (x,item[x]))
+
+
+
+
+
+
+
+
+
 def index_read(file_keys,file_values):
     f_keys=open(file_keys,'r')
     f_value=open(file_values,'r')

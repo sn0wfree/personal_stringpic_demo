@@ -78,7 +78,8 @@ def generateallurl(n,x):
 
 
 count = 0
-def writeafile(x,y):
+def writeafile(x,file):
+    f=open(file,'a+')
     clean_list = list(set(x))
     global count
     hashes = '#' * int(count)
@@ -86,7 +87,7 @@ def writeafile(x,y):
     for i in xrange(0, lenallurl_clean_list):
         if clean_list[i] != '':
             #print clean_list[i]
-            y.write(clean_list[i]+'\n')
+            f.write(clean_list[i])
             sys.stdout.write("\rthis spider has already written %d urls/project" % count)
             count = count + 1
             sys.stdout.flush()
@@ -123,6 +124,31 @@ def index_read(file_keys,file_values):
     return index
 
 
+
+
+def item_read(file):
+    f=open(file,'r').readlines
+    lines = f.split('')
+    #for line in f:
+
+
+
+
+
+def projetcdata_txt_write(item,file):
+    f=open(file,'a+')
+    #f_value=open(file_values,'w')
+
+    f.write(str(item)+';')
+        #f_value.write(str(index_value[i])+';')
+    #f.close()
+    f.close()
+    #print 'saving ptoject data process completed'
+
+
+
+
+
 def index_write(index,file_keys,file_values):
     f_keys=open(file_keys,'w')
     f_value=open(file_values,'w')
@@ -141,29 +167,31 @@ def index_write(index,file_keys,file_values):
 
 
 
-def compareindexprocess(id,state,index):
+def compareindexprocess(id,state,index,new_add,updated,repeated):
 
     if  index.has_key(id) :
         if index[id] =='live':
             index.pop(id)
             index[id]=state
-            a=1
-            state_code=2
+            exist_code=1
+            updated+=1
             #total_item.append(item)
             #total_rewards.append(rewards)
         else:
-            a=0
-            state_code=3
+            exist_code=0
+            repeated +=1
             #a=['replicated projetcs']
     else:
             #a=['replicated projetcs']
         index[id]=state
-        state_code=1
+
+        new_add+=1
         #total_item.append(item)
         #total_rewards.append(rewards)
-        a=1
+        exist_code=1
 
-    return a,index,state_code
+
+    return exist_code,index,new_add,updated,repeated
 
 def datagenerateprocess(url):
     if url != '':
@@ -226,7 +254,7 @@ def progress_test():
 def opt(someurl):
     #line = someurl
     #kicktraqrool_url = 'http://www.kicktraq.com/'
-    state =[]
+    #state =[]
     #if 'https://www.kickstarter.com/'  in line:
     #    data_collect_tool_halfurl = line.split('https://www.kickstarter.com/')[1]
         #print type(data_collect_tool_halfurl)
@@ -268,7 +296,7 @@ def opt(someurl):
 
         #else:
 
-    return (a,b,c,d)
+    return a,b,c,d
     #return state
 
 def OnlyStr(s,oth=''):

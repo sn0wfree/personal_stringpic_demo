@@ -6,46 +6,62 @@ import Queue
 import datetime
 import time
 import sys
+
+
+import sys
+
+
+
 start = time.time()
-def main(url,core):
-    a = len(url)
-    for j in xrange(core):
-        t = ThreadClass(queue)
-        t.setDaemon(True)
-        t.start()
-    for i in range(0,a):
-        queue.put(url[i])
-    queue.join()
+
+
+
+    # insert the data to databases
+
+
+
+
+
+#def main(url,core):
+#    a = len(url)
+#    for j in xrange(core):
+#        t = ThreadClass(queue)
+#        t.setDaemon(True)
+#        t.start()
+#    for i in range(0,a):
+#        queue.put(url[i])
+#    queue.join()
 #construct opt index dic for list
 global counts
 counts = 0
-queue = Queue.Queue()
-class ThreadClass(threading.Thread):
-    def __init__(self, queue):
-        threading.Thread.__init__(self)
-        self.queue = queue
-    def run(self):
-        while 1:
-            target = self.queue.get()
-            print 'begin downloading data'
 
-            (item,rewards,id,state)= funcforkick.datagenerateprocess(target)
-            (index,exist_code) = funcforkick.compareindexprocess(id,state,index)
+#queue = Queue.Queue()
+#class ThreadClass(threading.Thread):
+#    def __init__(self, queue):
+#        threading.Thread.__init__(self)
+#        self.queue = queue
+#    def run(self):
+#        while 1:
+#            target = self.queue.get()
+#            print 'begin downloading data'
+
+#            (item,rewards,id,state)= funcforkick.datagenerateprocess(target)
+#            (index,exist_code) = funcforkick.compareindexprocess(id,state,index)
             #print item,rewards
 
-            if exist_code == 1:
-                total_item.append(item)
-                total_rewards.append(rewards)
+#            if exist_code == 1:
+#                total_item.append(item)
+#                total_rewards.append(rewards)
 
-            sys.stdout.write("\rthis spider has already download %d urls/project" % counts)
-            counts = counts + 1
-            sys.stdout.flush()
+#            sys.stdout.write("\rthis spider has already download %d urls/project" % counts)
+#            counts = counts + 1
+#            sys.stdout.flush()
 
             #x = discorurl(target)
             #file = open('allurlforkicktest.txt','a')
             #writeafile(x,file)
             #time.sleep(1/10)
-            self.queue.task_done()
+#            self.queue.task_done()
 
 
 global index
@@ -58,13 +74,15 @@ file_unclear_file = open('allurlforkicktest.txt','r')
 file_unclear =file_unclear_file.readlines()
 file_unclear_file.close()
 index = funcforkick.index_read('index_value.txt','index_keys.txt')
-print index
+total_item=[]
+total_rewards=[]
+#print index
 #total_item_lines = open ('data.txt','r').readlines()
 #total_rewards_lines= open ('rewards.txt','r').readlines()
 #index = {}
-total_item=[]
+
 #total_item= funcforkick.item_read('index.txt')
-total_rewards=[]
+
 #total_rewards= funcforkick.rewards_read('rewards.txt')
 #print 'reading list completed'
 file =list(set(file_unclear))
@@ -83,34 +101,40 @@ print 'begin to collecting data'
 #            urls1.append(file[j])
 #main(file ,3)
 lenfile = len(file)
-new_add=0
-updated=0
-repeated=0
+
 for i in xrange(0,lenfile):
     someurl=file[i]
     if someurl !='':
         (item,rewards,ID,state)= funcforkick.datagenerateprocess(someurl)
-
-        (exist_code,index,state_code) = funcforkick.compareindexprocess(ID,state,index)
+        new_add=0
+        updated=0
+        repeated=0
+        (exist_code,index,new_add,updated,repeated) = funcforkick.compareindexprocess(ID,state,index,new_add,updated,repeated)
         #1:new_add
         #2:updated
         #3:repeated
-        if state_code != 1:
-            if state_code !=2:
-                repeated +=1
-            else:
-                updated+=1
-        else:
-            new_add+=1
-
-        #print item,rewards
         if exist_code != 0:
-            total_item.append(item)
+            a=(item['creator_personal_url'],item[' creator_buildhistory_has_backed_projects_number'],item[' Goal'],item[' creator_buildhistory_has_built_projects_number'],item[' creator_bio_info_url'],item[' creator_Facebook_url'],item[' currency'],item[' duration'],item[' Project_ID'],item[' location_ID'],item[' state_changed_at'],item[' description'],item[' category'],item[' project_state'],item[' has_a_video'],item[' comments_count'],item[' updates_number'],item[' project_name'],item[' data_percent_rasied'],item[' hours_left'],item[' pledged_amount'],item[' creator_short_name'],item[' creator_friends__facebook_number'],item[' created_at'],item[' Deadline'],item[' backers_count'],item[' creator_full_name'])
+            total_item.append(a)
             total_rewards.append(rewards)
             counts = counts + 1
+        if len(total_item)>10:
+            for x in total_item:
+                funcforkick.projetcdata_txt_write(x,'item.txt')
+
+            for y in total_rewards:
+                funcforkick.projetcdata_txt_write(y,'rewards.txt')
+            #reset list
+            total_item=[]
+            total_rewards=[]
+
+
+        #conditional_insert(cursor, item)
         sys.stdout.write("\rthis spider has already read %d projects and %d new add, %d updated, %d repeated" % (counts,new_add,updated,repeated))
         sys.stdout.flush()
-        time.sleep(1)
+        #time.sleep(1)
+
+
 
 
 
@@ -138,6 +162,8 @@ for i in xrange(0,lenfile):
 #    total_rewards.write(total_rewards[i]+'\n')
 #print '\n',total_item
 #csv_writer(index,f,w)
+
+
 print '\n the len of total_item :' , len(total_item)
 funcforkick.index_write(index,'index_value.txt','index_keys.txt')
 #csv_writer(total_item,f_items,a)

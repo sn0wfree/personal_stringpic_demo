@@ -9,9 +9,9 @@ import sys
 
 #urls = open("category.txt",'r').readlines()
 def firstset(x):
-    a = generateallurl.seekurl(x,x+1,200)#oringal(1,54,200)11-54
-    #file = open ('url%s.txt' % x , 'a')
-    return (file,a)
+    b = generateallurl.seekurl(x,x+1,200)#oringal(1,54,200)11-54
+    #file = open ('url%s.text' % x , 'a')
+    return b
 
 
 count = 0
@@ -20,7 +20,7 @@ count = 0
 #for i in xrange(0,len(urls)):
 #    file2.write(urls[i]+'\n')
 def writeafile(x,y):
-    clean_list = (x)
+    clean_list = list(set(x))
     global count
     hashes = '#' * int(count)
     if clean_list != []:
@@ -42,15 +42,14 @@ class ThreadClass(threading.Thread):
             target = self.queue.get()
             x = generateallurl.discorurl(target)
             writeafile(x,file)
-
+            time.sleep(0.5)
             #if  url1 != [] :
             #    lenurl1 = len(url1)
             #    for j in xrange(0,lenurl1):
             #        allurl.append(url1)
 
             self.queue.task_done()
-urls=[]
-global urls
+
 
 def main():
     for j in xrange(3):
@@ -61,13 +60,13 @@ def main():
             queue.put(url)
     queue.join()
 
-
 def downloadforurl(x):
     #i = int(input("Please enter an integer(1-54):"))
-    urls = open ('category2.txt','r').readlines()
-
+    urls = open('category1.text','r').readlines()
     global urls
-    file = open('allurlforkicktest1.txt','w')
-    #(file,urls) = firstset(x)
-
+    
+    file = open ('all1234.text' , 'a')
+    global file
+    
     main()
+

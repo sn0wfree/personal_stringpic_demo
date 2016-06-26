@@ -10,16 +10,16 @@ from lxml import etree
 import pickle
 from urllib2 import Request, urlopen, URLError
 import os
-import kickspider
+import csv
+import pandas as pd
+import numpy as np
 
 
 #generate category url
 def generatecategoryurl(file):
     urls = generateallurl(1,54)
     writeafile(urls,file)
-
     return urls
-
 def generateallurl(n,x):
     url = []
     for i in xrange(n, x):#category
@@ -76,7 +76,6 @@ def generateallurl(n,x):
                                                                                 url.append('https://www.kickstarter.com/discover/advanced?category_id='+ str(i) + '&pledged='+ str(k) + '&goal='+ str(l) + '&sort=newest&seed=2409590&page=' + str(j+1))
     return url
 
-
 count = 0
 def writeafile(x,file):
     f=open(file,'a+')
@@ -93,8 +92,8 @@ def writeafile(x,file):
             sys.stdout.flush()
 
 def index_read(file_keys,file_values):
-    f_keys=open(file_keys,'r')
-    f_value=open(file_values,'r')
+    f_keys=open(file_keys,'r+')
+    f_value=open(file_values,'r+')
 
     f_keys_reads=f_keys.readlines()
     f_value_reads=f_value.readlines()
@@ -146,6 +145,31 @@ def projetcdata_txt_write(item,file):
     #print 'saving ptoject data process completed'
 
 
+def rewardsseperategenerateprocess(rewards):
+    rewards_backers_distribution_dict={}
+    rewards_pledge_limit_dict={}
+    rewards_pledged_amount_dict={}
+    rewards_backers_distribution = rewards['rewards_backers_level_distribution']
+    rewards_pledge_limit =rewards['pledge_limit']
+    rewards_pledged_amount = rewards['rewards_level_divided_by_goal']
+    lenrewards_backers_distribution=len(rewards_backers_distribution)
+    rewards_backers_distribution_dict['Project_ID']=rewards['Project_ID']
+    rewards_pledge_limit_dict['Project_ID']=rewards['Project_ID']
+    rewards_pledged_amount_dict['Project_ID']=rewards['Project_ID']
+    for i in xrange(lenrewards_backers_distribution):
+        if i<len(rewards_backers_distribution):
+            rewards_backers_distribution_dict['%s' %i]=rewards_backers_distribution[i]
+        else:
+            rewards_backers_distribution_dict['%s' %i]='0'
+        if i<len(rewards_pledge_limit):
+            rewards_pledge_limit_dict['%s' %i]=rewards_pledge_limit[i]
+        else:
+            rewards_pledge_limit_dict['%s' %i]='0'
+        if i<len(rewards_pledged_amount):
+            rewards_pledged_amount_dict['%s' %i]=rewards_pledged_amount[i]
+        else:
+            rewards_pledged_amount_dict['%s' %i]='0'
+    return rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict
 
 
 
@@ -168,7 +192,6 @@ def index_write(index,file_keys,file_values):
 
 
 def compareindexprocess(id,state,index,new_add,updated,repeated):
-
     if  index.has_key(id) :
         if index[id] =='live':
             index.pop(id)
@@ -180,17 +203,12 @@ def compareindexprocess(id,state,index,new_add,updated,repeated):
         else:
             exist_code=0
             repeated +=1
-            #a=['replicated projetcs']
     else:
-            #a=['replicated projetcs']
         index[id]=state
-
         new_add+=1
         #total_item.append(item)
         #total_rewards.append(rewards)
         exist_code=1
-
-
     return exist_code,index,new_add,updated,repeated
 
 def datagenerateprocess(url):
@@ -203,7 +221,6 @@ def datagenerateprocess(url):
         id=0
         state='='
     #print '\ndata generate process completed'
-
     return item,rewards,id,state
 
 
@@ -242,7 +259,7 @@ def collectfile(url):
 
 def progress_test():
   bar_length=20
-  for percent in xrange(0, 100):
+  for percent in xrange(100):
     hashes = '#' * int(percent/100.0 * bar_length)
     spaces = ' ' * (bar_length - len(hashes))
     sys.stdout.write("\rPercent: [%s] %d%%"%(hashes + spaces, percent))
@@ -345,6 +362,19 @@ def daufcurl(someurl):
 
 
 
+
+def savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount):
+    total_item.append(item)
+    (rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict)=rewardsseperategenerateprocess(rewards)
+    total_rewards_backers_distribution.append(rewards_backers_distribution_dict)
+    total_rewards_pledge_limit.append(rewards_pledge_limit_dict)
+    total_rewards_pledged_amount.append(rewards_pledged_amount_dict)
+    return total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount
+    #print list(rewards)
+
+
+
+
 queue = Queue.Queue()
 class ThreadClass(threading.Thread):
     def __init__(self, queue):
@@ -372,7 +402,14 @@ def main(x,y):
     queue.join()
 
 
-
+def writeacsvprocess(file,a,headers,item):
+    with open(file,'%s' %str(a)) as project_data:
+        project_data_csv = csv.DictWriter(project_data, headers)
+        project_data_csv.writeheader()
+        if type(item)==list:
+            project_data_csv.writerows(item)
+        if type(item)==dict:
+            project_data_csv.writerow(item)
 
 
 def downloadforurl(x,y):

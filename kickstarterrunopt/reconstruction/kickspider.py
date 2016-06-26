@@ -292,9 +292,9 @@ def webscraper_live(someurl):
         item[ 'creator_personal_url']=''.join(creator_personal_url)
         item[ 'creator_bio_info_url']=''.join(creator_bio_info_url)
         item[ 'creator_full_name']=''.join(creator_full_name)
-        item[ 'creator_buildhistory_has_built_projects_number']=creator_buildhistory_has_built_projects_number
+        item[ 'creator_built_projects_number']=creator_buildhistory_has_built_projects_number
         item[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
-        item[ 'creator_friends__facebook_number' ]=''.join(creator_friends__facebook_number)
+        item[ 'creator_friends_facebook_number' ]=''.join(creator_friends__facebook_number)
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
         item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count
@@ -460,11 +460,11 @@ def webscraper_failorcanceled(someurl):
             pledge_limit_split =''.join(pledge_limit_split)
             pledge_limit.append(pledge_limit_split)
             #ship_location_info
-            ship_location_info_split_list = sel.xpath(ship_location_info_a)
-            ship_location_info_split = ship_location_info_split_list
+            #ship_location_info_split_list = sel.xpath(ship_location_info_a)
+            #ship_location_info_split = ship_location_info_split_list
             #print ship_location_info_split, ship_location_info_split_list
-            ship_location_info_split =''.join(ship_location_info_split)
-            ship_location_info_split= str(ship_location_info_split)
+            #ship_location_info_split =''.join(ship_location_info_split)
+            #ship_location_info_split= str(ship_location_info_split)
             #ship_location_info[i-1] = ship_location_info_split
         deadline_xpath= sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[1]/div/div/p/time/text()')
         #project_description
@@ -545,7 +545,7 @@ def webscraper_failorcanceled(someurl):
         state_changed_at = ''.join(state_changed_at_str).strip('"')
 
         #print state_changed_at
-        deadline_date= ''.join(deadline_xpath)
+        deadline_date= ''.join(deadline_quot_str)
         backers_count_str = ''.join(backers_count)
         goal_str = ''.join(goal)
         pledged_amount_str =''.join(pledged_amount)
@@ -590,9 +590,9 @@ def webscraper_failorcanceled(someurl):
         item[ 'creator_personal_url']=''.join(creator_personal_url)
         item[ 'creator_bio_info_url']=''.join(creator_bio_info_url)
         item[ 'creator_full_name']=''.join(creator_full_name)
-        item[ 'creator_buildhistory_has_built_projects_number']=creator_buildhistory_has_built_projects_number
+        item[ 'creator_built_projects_number']=creator_buildhistory_has_built_projects_number
         item[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
-        item[ 'creator_friends__facebook_number' ]=''.join(creator_friends__facebook_number)
+        item[ 'creator_friends_facebook_number' ]=''.join(creator_friends__facebook_number)
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
         item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count
@@ -913,9 +913,9 @@ def webscraper_successed(someurl):
         item[ 'creator_personal_url']=''.join(creator_personal_url)
         item[ 'creator_bio_info_url']=''.join(creator_bio_info_url)
         item[ 'creator_full_name']=''.join(creator_full_name).strip()
-        item[ 'creator_buildhistory_has_built_projects_number']=creator_buildhistory_has_built_projects_number
+        item[ 'creator_built_projects_number']=creator_buildhistory_has_built_projects_number
         item[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
-        item[ 'creator_friends__facebook_number' ]=''.join(creator_friends__facebook_number)
+        item[ 'creator_friends_facebook_number' ]=''.join(creator_friends__facebook_number)
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
         item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count

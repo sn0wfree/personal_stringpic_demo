@@ -1,5 +1,5 @@
-import csv
-import kickspider
+
+
 import sys
 import funcforkick
 import time
@@ -18,7 +18,7 @@ global total_rewards
 
 print 'begin to create/read index file'
 #read projetc urls
-file_unclear_file = open('data/allurlforkicktest.txt','r+')
+file_unclear_file = open('data/top20project.txt','r+')
 file_unclear =file_unclear_file.readlines()
 file_unclear_file.close()
 index = funcforkick.index_read('data/index_value20.txt','data/index_keys20.txt')
@@ -27,7 +27,7 @@ w='a'
 
 
 saving_file ='data/project_data.csv'
-rewards_headers=['Project_ID','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19']
+rewards_headers=['Project_ID','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50']
 item_headers = ['Project_ID','project_name','Goal',
           'pledged_amount','backers_count','creator_full_name',
           'creator_personal_url','creator_buildhistory_has_backed_projects_number','creator_built_projects_number',
@@ -59,11 +59,14 @@ for someurl in file:
             counts = counts + 1
             funcforkick.projetcdata_txt_write(item,'data/item.txt')
             funcforkick.projetcdata_txt_write(rewards,'data/rewards.txt')
-        if len(total_item)>100:
-            funcforkick.writeacsvprocess(saving_file,w,headers,total_item)
-            funcforkick.writeacsvprocess(rewards_backers_distribution,w,rewards_headers,total_rewards_backers_distribution)
-            funcforkick.writeacsvprocess(rewards_pledge_limit,w,rewards_headers,total_rewards_pledge_limit)
-            funcforkick.writeacsvprocess(rewards_pledged_amount,w,rewards_headers,total_rewards_pledged_amount)
+        if len(total_item)>0:
+            #print total_rewards_backers_distribution
+            #print total_rewards_pledge_limit,total_rewards_pledged_amount
+            #print
+            funcforkick.writeacsvprocess(saving_file,item_headers,total_item)
+            funcforkick.writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
+            funcforkick.writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)
+            funcforkick.writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
             #reset list
             total_item=[]
             total_rewards_backers_distribution=[]
@@ -72,6 +75,11 @@ for someurl in file:
         #conditional_insert(cursor, item)
     sys.stdout.write("\rthis spider has already read %d projects and %d new add, %d updated, %d repeated" % (counts,new_add,updated,repeated))
     sys.stdout.flush()
+funcforkick.writeacsvprocess(saving_file,item_headers,total_item)
+funcforkick.writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
+funcforkick.writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)
+funcforkick.writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
+            #reset list
         #time.sleep(1)
 funcforkick.index_write(index,'data/index_value20.txt','data/index_keys20.txt')
 #end = time.time()

@@ -1,6 +1,8 @@
 import threading
 import Queue
 import kickspider
+import kickspidersuccessed
+import kickspiderfail
 import datetime
 import time
 import sys
@@ -10,6 +12,7 @@ from lxml import etree
 import pickle
 from urllib2 import Request, urlopen, URLError
 import os
+import unicodecsv
 import csv
 import pandas as pd
 import numpy as np
@@ -123,16 +126,10 @@ def index_read(file_keys,file_values):
     return index
 
 
-
-
 def item_read(file):
     f=open(file,'r').readlines
     lines = f.split('')
     #for line in f:
-
-
-
-
 
 def projetcdata_txt_write(item,file):
     f=open(file,'a+')
@@ -224,13 +221,10 @@ def datagenerateprocess(url):
     return item,rewards,id,state
 
 
-
-
 def extend_result(x,y,a,b):
     a.extend(x)
     b.extend(y)
     return a,b
-
 
 
 def readfile():
@@ -256,7 +250,6 @@ def collectfile(url):
     file.close()
 
 
-
 def progress_test():
   bar_length=20
   for percent in xrange(100):
@@ -266,23 +259,11 @@ def progress_test():
     sys.stdout.flush()
     time.sleep(1)
 
-
-
 def opt(someurl):
-    #line = someurl
-    #kicktraqrool_url = 'http://www.kicktraq.com/'
-    #state =[]
-    #if 'https://www.kickstarter.com/'  in line:
-    #    data_collect_tool_halfurl = line.split('https://www.kickstarter.com/')[1]
-        #print type(data_collect_tool_halfurl)
-    #    data_collect_tool_url = kicktraqrool_url + data_collect_tool_halfurl
     try:
           response = Request(someurl)
           content = urllib2.urlopen(someurl).read()
           sel= etree.HTML(content)
-          ##this is for some data without tab.
-          #req = urlopen(response)
-          #the_page1 = req.readlines()
     except URLError as e:
         if hasattr(e, 'reason'):
             print 'We failed to reach a server.'
@@ -304,15 +285,9 @@ def opt(someurl):
             (a,b,c,d)=kickspider.webscraper_live(someurl)
         else:
             if state == 'successful':
-                (a,b,c,d) = kickspider.webscraper_successed(someurl)
+                (a,b,c,d) = kickspidersuccessed.webscraper_successed(someurl)
             else:
-                (a,b,c,d)= kickspider.webscraper_failorcanceled(someurl)
-                #suspended
-            #print 'non live projects'
-            #(a,b,c,d)=kickspider.webscraper_failorcanceled(someurl)
-
-        #else:
-
+                (a,b,c,d)= kickspiderfail.webscraper_failorcanceled(someurl)
     return a,b,c,d
     #return state
 
@@ -324,16 +299,11 @@ def OnlyStr(s,oth=''):
            s = s.replace(c,'');
    return s;
 
-
 def daufcurl(someurl):
     wasd = []
-
-
-    #global wasd
     root_url = 'https://www.kickstarter.com'
     if someurl != '':
         try:
-
             response = Request(someurl)
             content = urllib2.urlopen(someurl).read()
             sel= etree.HTML(content)
@@ -402,24 +372,17 @@ def main(x,y):
     queue.join()
 
 
-def writeacsvprocess(file,a,headers,item):
-    with open(file,'%s' %str(a)) as project_data:
-        project_data_csv = csv.DictWriter(project_data, headers)
+def writeacsvprocess(file,headers,item):
+    with open(file,'a') as project_data:
+        project_data_csv = unicodecsv.DictWriter(project_data, headers)
         project_data_csv.writeheader()
-        if type(item)==list:
-            project_data_csv.writerows(item)
-        if type(item)==dict:
-            project_data_csv.writerow(item)
+        project_data_csv.writerows(item)
+
+
 
 
 def downloadforurl(x,y):
-    #i = int(input("Please enter an integer(1-54):"))
-    #(file,urls) = firstset(x)
-    #for i in range(0,len(x)):
-        #uuu = discorurl(x[i])
-        #global uuu
-        #file = open('allurlforkicktest1.txt','a')
-        #writeafile(uuu,file)
+
     main(x,y)
 
 def discorurl(y):

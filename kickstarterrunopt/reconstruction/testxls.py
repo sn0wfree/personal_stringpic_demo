@@ -5,6 +5,9 @@ import kickspider
 from openpyxl import Workbook
 import sys
 import funcforkick
+
+
+
 start = time.time()
 global counts
 counts = 0
@@ -12,6 +15,9 @@ global index
 global total_item
 global total_rewards
 print 'begin to create/read index file'
+
+
+
 #read projetc urls
 file_unclear_file = open('data/allurlforkicktest1.txt','r')
 file_unclear =file_unclear_file.readlines(10)
@@ -22,6 +28,9 @@ total_rewards=[]
 file =list(set(file_unclear))
 print len(file)
 print 'begin to collecting data'
+
+
+
 wb = Workbook()
 ws = wb.active
 lenfile = len(file)

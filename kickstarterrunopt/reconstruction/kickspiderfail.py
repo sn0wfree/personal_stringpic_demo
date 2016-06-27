@@ -300,6 +300,7 @@ def webscraper_failorcanceled(someurl):
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
         item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count
+        item['url']=someurl
         #multi-data
         rewards={}
 

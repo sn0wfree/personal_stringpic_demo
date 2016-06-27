@@ -299,6 +299,7 @@ def webscraper_live(someurl):
         item[ 'updates_number']=''.join(updates)
         item[ 'comments_count']= comments_count
         item['duration'] =''.join(data_duration)
+        item['url']=someurl
         #multi-data
         rewards={}
 

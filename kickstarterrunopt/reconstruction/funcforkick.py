@@ -3,6 +3,7 @@ import Queue
 import kickspider
 import kickspidersuccessed
 import kickspiderfail
+import kickspideropt
 import datetime
 import time
 import sys
@@ -260,34 +261,71 @@ def progress_test():
     time.sleep(1)
 
 def opt(someurl):
+    #item['Project_ID']=0
+    ##item['project_name']=0
+    #item['Goal']=0
+    #item['url']=0
+    #item['pledged_amount']=0
+    #item['backers_count']=0
+    #item['creator_full_name']=0
+    #item['creator_personal_url']=0
+    #item['creator_buildhistory_has_backed_projects_number']=0
+    #item['creator_built_projects_number']=0
+    #item['creator_bio_info_url']=0
+    #item['creator_Facebook_url']=0
+    #item['currency']=0
+    #item['duration']=0
+    #item['location_ID']=0
+    #item['state_changed_at']=0
+    #item['created_at']=0
+    #item['Deadline']=0
+    #item['description']=0
+    #item['category']=0
+    #item['project_state']=0
+    #item['has_a_video']=0
+    #item['comments_count']=0
+    #item['updates_number']=0
+    #item['data_percent_rasied']=0
+    #item['hours_left']=0
+    #item['creator_short_name']=0
+    #item['creator_friends_facebook_number']=0
+    #rewards['rewards_backers_level_distribution']=['null']
+    #rewards['pledge_limit']=['null']
+    #rewards['rewards_level_divided_by_goal']=['null']
     try:
-          response = Request(someurl)
-          content = urllib2.urlopen(someurl).read()
-          sel= etree.HTML(content)
+        response = Request(someurl)
+        content = urllib2.urlopen(someurl).read()
+        sel= etree.HTML(content)
+        req = urlopen(response)
+        the_page1 = req.readlines()
     except URLError as e:
         if hasattr(e, 'reason'):
             print 'We failed to reach a server.'
             print 'Reason: ', e.reason
+            #a=item
             a={}
+            #b=rewards
             b={}
             c=0
-            d=''
+            d='error'
         elif hasattr(e, 'code'):
             print 'The server couldn\'t fulfill the request.'
             print 'Error code: ', e.code
+            #a=item
             a={}
+            #b=rewards
             b={}
             c=0
-            d=''
+            d='error'
     else:
         state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
         if state == 'live':
-            (a,b,c,d)=kickspider.webscraper_live(someurl)
+            (a,b,c,d)=kickspideropt.webscraper_live(someurl,sel,the_page1)
         else:
             if state == 'successful':
-                (a,b,c,d) = kickspidersuccessed.webscraper_successed(someurl)
+                (a,b,c,d) = kickspideropt.webscraper_successed(someurl,sel,the_page1)
             else:
-                (a,b,c,d)= kickspiderfail.webscraper_failorcanceled(someurl)
+                (a,b,c,d)= kickspideropt.webscraper_failorcanceled(someurl,sel,the_page1)
     return a,b,c,d
     #return state
 

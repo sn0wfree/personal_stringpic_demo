@@ -12,31 +12,12 @@ import MySQLdb.cursors
 import sys
 
 
-class kickPipeline(object):
-    def __init__(self):
-        self.dbpool = adbapi.ConnectionPool('localhost',
-                db = 'kickdatafortest',
-                user = 'root',
-                passwd = '19920815',
-                cursorclass = MySQLdb.cursors.DictCursor,
-                charset = 'utf8',
-                use_unicode = False
-                )
-    def process_item(self, item, spider):
-        query = self.dbpool.runInteraction(self._conditional_insert, item)
-        return item
 
-    # insert the data to databases
-    def _conditional_insert(self, cursor, item):
-        listitem = list(item)
-        sql = "insert into project values(%s) "
-        for x in listitem:
-            cursor.execute(sql, (item[x]))
 #try:
-    #db = MySQLdb.connect('localhost','root','19920815','kickdatafortest');
+#    db = MySQLdb.connect('localhost','root','19920815','kickdatafortest');
 
-    #cur=db.cursor()
-    #cur.execute('SELECT VERSION()')
+#    cur=db.cursor()
+#    cur.execute('SELECT VERSION()')
     #_conditional_insert
     #data = cur.fetchone()
 

@@ -18,15 +18,15 @@ global total_rewards
 
 print 'begin to create/read index file'
 #read projetc urls
-file_unclear_file = open('data/top20project.txt','r+')
+file_unclear_file = open('data/first20project/first20project.txt','r+')
 file_unclear =file_unclear_file.readlines()
 file_unclear_file.close()
-index = funcforkick.index_read('data/index_value20.txt','data/index_keys20.txt')
+index = funcforkick.index_read('data/first20project/index_value20.txt','data/first20project/index_keys20.txt')
 
 w='a'
 
 
-saving_file ='data/project_data.csv'
+saving_file ='data/first20project/project_data.csv'
 rewards_headers=['Project_ID','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50']
 item_headers = ['Project_ID','project_name','Goal',
           'pledged_amount','backers_count','creator_full_name',
@@ -36,10 +36,9 @@ total_item=[]
 total_rewards_backers_distribution=[]
 total_rewards_pledge_limit=[]
 total_rewards_pledged_amount=[]
-project_data='data/project_data.csv'
-rewards_backers_distribution='data/rewards_backers_distribution.csv'
-rewards_pledge_limit='data/rewards_pledge_limit.csv'
-rewards_pledged_amount='data/rewards_pledged_amount.csv'
+rewards_backers_distribution='data/first20project/rewards_backers_distribution.csv'
+rewards_pledge_limit='data/first20project/rewards_pledge_limit.csv'
+rewards_pledged_amount='data/first20project/rewards_pledged_amount.csv'
 file =list(set(file_unclear))
 new_add=0
 updated=0
@@ -57,9 +56,9 @@ for someurl in file:
         if exist_code != 0:
             (total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=funcforkick.savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
             counts = counts + 1
-            funcforkick.projetcdata_txt_write(item,'data/item.txt')
-            funcforkick.projetcdata_txt_write(rewards,'data/rewards.txt')
-        if len(total_item)>0:
+            funcforkick.projetcdata_txt_write(item,'data/first20project/item.txt')
+            funcforkick.projetcdata_txt_write(rewards,'data/first20project/rewards.txt')
+        if len(total_item)>100:
             #print total_rewards_backers_distribution
             #print total_rewards_pledge_limit,total_rewards_pledged_amount
             #print
@@ -67,6 +66,7 @@ for someurl in file:
             funcforkick.writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
             funcforkick.writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)
             funcforkick.writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
+            funcforkick.index_write(index,'data/first20project/index_value20.txt','data/first20project/index_keys20.txt')
             #reset list
             total_item=[]
             total_rewards_backers_distribution=[]
@@ -81,6 +81,8 @@ funcforkick.writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_
 funcforkick.writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
             #reset list
         #time.sleep(1)
-funcforkick.index_write(index,'data/index_value20.txt','data/index_keys20.txt')
+funcforkick.index_write(index,'data/first20project/index_value20.txt','data/first20project/index_keys20.txt')
+print 'saving process completed'
+
 #end = time.time()
 #print end-start

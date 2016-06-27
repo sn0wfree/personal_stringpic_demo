@@ -184,7 +184,7 @@ def index_write(index,file_keys,file_values):
         f_value.write(str(index_value[i])+';')
     f_keys.close()
     f_value.close()
-    print 'saving process completed'
+    #print 'saving process completed'
 
 
 

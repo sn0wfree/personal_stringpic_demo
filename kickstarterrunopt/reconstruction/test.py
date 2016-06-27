@@ -11,6 +11,9 @@ import multiprocessing as mp
 list = open('data/last80project.txt','r+').readlines()
 list_clean =list(set(list))
 
+lenlist =len(list_clean)
+
+
 
 
 

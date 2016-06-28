@@ -96,51 +96,43 @@ def writeafile(x,file):
             sys.stdout.flush()
 
 def index_read(file_keys,file_values):
-    f_keys=open(file_keys,'r+')
-    f_value=open(file_values,'r+')
-
-    f_keys_reads=f_keys.readlines()
-    f_value_reads=f_value.readlines()
-    for f_keys_read in f_keys_reads:
-        f_keys_r = f_keys_read.split(';')
-    for f_value_read in f_value_reads:
-        f_value_r = f_value_read.split(';')
-
-
-    if f_keys_reads != []:
-        if f_keys_r[-1] == ''  :
-            f_keys_r.pop()
-        if f_value_r[-1] ==''  :
-            f_value_r.pop()
-    else:
-        f_keys_r=[]
-        f_value_r=[]
-
-
-    lenindex_key =  len(f_keys_r)
-    index={}
-    for i in xrange(0,lenindex_key):
-        index[f_keys_r[i]]=f_value_r[i]
-    f_keys.close()
-    f_value.close()
-    print 'reading index completed'
-    return index
+    with open(file_keys,'r+') as f_keys, open(file_values,'r+') as f_value:
+     f_keys_reads=f_keys.readlines()
+     f_value_reads=f_value.readlines()
+     for f_keys_read in f_keys_reads:
+         f_keys_r = f_keys_read.split(';')
+     for f_value_read in f_value_reads:
+         f_value_r = f_value_read.split(';')
+     if f_keys_reads != []:
+         if f_keys_r[-1] == ''  :
+             f_keys_r.pop()
+         if f_value_r[-1] ==''  :
+             f_value_r.pop()
+     else:
+         f_keys_r=[]
+         f_value_r=[]
+     lenindex_key =  len(f_keys_r)
+     index={}
+     for i in xrange(0,lenindex_key):
+         index[f_keys_r[i]]=f_value_r[i]
+     print 'reading index completed'
+     return index
 
 
 def item_read(file):
-    f=open(file,'r').readlines
-    lines = f.split('')
+    with open(file) as f:
+        file=f.readlines()
+        lines = file.split('')
     #for line in f:
 
 def projetcdata_txt_write(item,file):
-    f=open(file,'a+')
-    #f_value=open(file_values,'w')
-
-    f.write(str(item)+';')
-        #f_value.write(str(index_value[i])+';')
-    #f.close()
-    f.close()
+    with open(file,'a+') as f:
+        f.write(str(item)+';')
     #print 'saving ptoject data process completed'
+def collected_list_write(item,file):
+    with open(file,'w') as f:
+        for x in item:
+            f.write(str(x)+'\n')
 
 
 def rewardsseperategenerateprocess(rewards):
@@ -154,52 +146,57 @@ def rewardsseperategenerateprocess(rewards):
     rewards_backers_distribution_dict['Project_ID']=rewards['Project_ID']
     rewards_pledge_limit_dict['Project_ID']=rewards['Project_ID']
     rewards_pledged_amount_dict['Project_ID']=rewards['Project_ID']
-    for i in xrange(lenrewards_backers_distribution):
-        if i<len(rewards_backers_distribution):
-            rewards_backers_distribution_dict['%s' %i]=rewards_backers_distribution[i]
-        else:
-            rewards_backers_distribution_dict['%s' %i]='0'
-        if i<len(rewards_pledge_limit):
-            rewards_pledge_limit_dict['%s' %i]=rewards_pledge_limit[i]
-        else:
-            rewards_pledge_limit_dict['%s' %i]='0'
-        if i<len(rewards_pledged_amount):
-            rewards_pledged_amount_dict['%s' %i]=rewards_pledged_amount[i]
-        else:
-            rewards_pledged_amount_dict['%s' %i]='0'
+    if lenrewards_backers_distribution<89:
+        for i in xrange(lenrewards_backers_distribution):
+            if i<len(rewards_backers_distribution):
+                rewards_backers_distribution_dict['%s' %i]=rewards_backers_distribution[i]
+            else:
+                rewards_backers_distribution_dict['%s' %i]='0'
+            if i<len(rewards_pledge_limit):
+                rewards_pledge_limit_dict['%s' %i]=rewards_pledge_limit[i]
+            else:
+                rewards_pledge_limit_dict['%s' %i]='0'
+            if i<len(rewards_pledged_amount):
+                rewards_pledged_amount_dict['%s' %i]=rewards_pledged_amount[i]
+            else:
+                rewards_pledged_amount_dict['%s' %i]='0'
+    else:
+        rewards_pledged_amount_dict={}
+        rewards_pledge_limit_dict={}
+        rewards_backers_distribution_dict={}
+
+
     return rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict
 
 
 
 def index_write(index,file_keys,file_values):
-    f_keys=open(file_keys,'w')
-    f_value=open(file_values,'w')
-    index_keys = list(index)
-    a=len(index_keys)
-    index_value=[]
-    for i in xrange(0,a):
-        b= index_keys[i]
-        index_value.append(index[b])
-    for i in xrange(0,a):
-        f_keys.write(str(index_keys[i])+';')
-        f_value.write(str(index_value[i])+';')
-    f_keys.close()
-    f_value.close()
+    with open(file_keys,'w') as f_keys, open(file_values,'w') as f_value:
+        index_keys = list(index)
+        a=len(index_keys)
+        index_value=[]
+        for i in xrange(0,a):
+            b= index_keys[i]
+            index_value.append(index[b])
+        for i in xrange(0,a):
+            f_keys.write(str(index_keys[i])+';')
+            f_value.write(str(index_value[i])+';')
+
     #print 'saving process completed'
 
 
 
 def datagenerateprocess(url,state,sel,the_page1):
     if url != '':
-        (item,rewards,id,state) = opt(url,state,sel,the_page1)
+        (item,rewards,ID,state) = opt(url,state,sel,the_page1)
     else:
         #print 'url is empty'
         item ={}
         rewards={}
-        id=0
+        ID=0
         state='='
     #print '\ndata generate process completed'
-    return item,rewards,id,state
+    return item,rewards,ID,state
 
 
 def extend_result(x,y,a,b):
@@ -275,12 +272,12 @@ def compareindexprocess(someurl,index,new_add,updated,repeated):
                 for word in words:
                     if 'data class="Project' in word:
                         project_ID_str = word.split('Project')[1]
-        id= ''.join(project_ID_str)
+        ID= ''.join(project_ID_str)
         state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
-    if  index.has_key(id) :
-        if index[id] =='live':
-            index.pop(id)
-            index[id]=state
+    if  index.has_key(ID) :
+        if index[ID] =='live':
+            index.pop(ID)
+            index[ID]=state
             exist_code=1
             updated+=1
             #total_item.append(item)
@@ -289,12 +286,12 @@ def compareindexprocess(someurl,index,new_add,updated,repeated):
             exist_code=0
             repeated +=1
     else:
-        index[id]=state
+        index[ID]=state
         new_add+=1
         #total_item.append(item)
         #total_rewards.append(rewards)
         exist_code=1
-    return exist_code,index,new_add,updated,repeated,id,state,sel,the_page1
+    return exist_code,index,new_add,updated,repeated,ID,state,sel,the_page1
 
 def opt(someurl,state,sel,the_page1):
     if state == 'live':
@@ -351,6 +348,7 @@ def daufcurl(someurl):
 
 def savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount):
     total_item.append(item)
+
     (rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict)=rewardsseperategenerateprocess(rewards)
     total_rewards_backers_distribution.append(rewards_backers_distribution_dict)
     total_rewards_pledge_limit.append(rewards_pledge_limit_dict)

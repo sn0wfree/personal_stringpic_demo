@@ -31,8 +31,8 @@ def listleftn(l):
 
 def webscraper_successed(someurl,a,the_page):
     root_url = 'https://www.kickstarter.com'
-    rewards={}
-    projectitem = {}
+    projectitem = {'Project_ID':0,'project_state':0}
+    rewards={'rewards_backers_level_distribution':['0'], 'pledge_limit':['0'], 'rewards_level_divided_by_goal':['0'],'Project_ID':0}
     try:
         if '?ref=category_newest' in someurl:
             aasd = someurl.rstrip("ref=category_newest")

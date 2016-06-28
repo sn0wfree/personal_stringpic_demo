@@ -19,15 +19,15 @@ global total_item
 global total_rewards
 
 print 'begin to create/read index file'
-target_url_file='last20project/last20.txt'
-have_collected_url='last20project/collected.txt'
+target_url_file='first20project/first20project.txt'
+have_collected_url='first20project/collected.txt'
 
-rewards_backers_distribution='last20project/rewards_backers_distribution.csv'
-rewards_pledge_limit='last20project/rewards_pledge_limit.csv'
-rewards_pledged_amount='last20project/rewards_pledged_amount.csv'
-item_collect='last20project/item.txt'
-rewards_collect='last20project/rewards.txt'
-saving_file ='last20project/project_data.csv'
+rewards_backers_distribution='first20project/rewards_backers_distribution.csv'
+rewards_pledge_limit='first20project/rewards_pledge_limit.csv'
+rewards_pledged_amount='first20project/rewards_pledged_amount.csv'
+item_collect='first20project/item.txt'
+rewards_collect='first20project/rewards.txt'
+saving_file ='first20project/project_data.csv'
 #index_value20='test/index_value.txt',
 #index_keys20='test/index_keys.txt'
 

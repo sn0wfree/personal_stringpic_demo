@@ -4,6 +4,7 @@ import time
 import urllib2
 import requests
 from lxml import etree
+import pp
 #import funcforkick
 
 #import MySQLdb
@@ -33,7 +34,7 @@ def listleftn(l):
 def webscraper_live(someurl):
     root_url = 'https://www.kickstarter.com'
     try:
-          response = Request(someurl)
+          response = Requests(someurl)
           content = urllib2.urlopen(someurl).read()
           sel= etree.HTML(content)
           ##this is for some data without tab.
@@ -311,3 +312,8 @@ def webscraper_live(someurl):
         rewards[ 'pledge_limit' ]= listleftn(pledge_limit)
         item['category']= category
     return item, rewards , item[ 'Project_ID'] , item['project_state']
+
+#someurl='https://www.kickstarter.com/projects/813187932/days-off-an-anthology?ref=category_featured'
+#c=requests.get(someurl)
+
+#print type(c)

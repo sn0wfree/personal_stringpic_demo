@@ -261,12 +261,15 @@ def daufcurl(someurl):
 
 #@profile
 def savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount):
-    total_item.append(item)
+    if item !={}:
+        total_item.append(item)
 
-    (rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict)=rewardsseperategenerateprocess(rewards)
-    total_rewards_backers_distribution.append(rewards_backers_distribution_dict)
-    total_rewards_pledge_limit.append(rewards_pledge_limit_dict)
-    total_rewards_pledged_amount.append(rewards_pledged_amount_dict)
+        (rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict)=rewardsseperategenerateprocess(rewards)
+        total_rewards_backers_distribution.append(rewards_backers_distribution_dict)
+        total_rewards_pledge_limit.append(rewards_pledge_limit_dict)
+        total_rewards_pledged_amount.append(rewards_pledged_amount_dict)
+
+
     return total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount
     #print list(rewards)
 
@@ -275,10 +278,18 @@ def savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_dis
 
 
 def writeacsvprocess(file,headers,item):
+    with open(file,'r+') as project_data:
+        project_data_read_csv = unicodecsv.reader(project_data,headers)
+        if not headers in project_data_read_csv:
+            status=0
+        else:
+            status=1
     with open(file,'a') as project_data:
-        project_data_csv = unicodecsv.DictWriter(project_data, headers)
-        project_data_csv.writeheader()
+        project_data_csv = unicodecsv.DictWriter(project_data,headers)
+        if status ==0:
+            project_data_csv.writeheader()
         project_data_csv.writerows(item)
+
 
 
 

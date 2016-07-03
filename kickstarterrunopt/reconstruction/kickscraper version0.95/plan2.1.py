@@ -25,11 +25,11 @@ def filepathcollection(a,publicpath):
     rewards_backers_distribution= publicpath+'/url%d/rewards_backers_distribution.csv'%a
     rewards_pledge_limit= publicpath+'/url%d/rewards_pledge_limit.csv'%a
     rewards_pledged_amount= publicpath+'/url%d/rewards_pledged_amount.csv'%a
-        #item_collect='/Users/sn0wfree/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/slpit/item.txt'
+        #item_collect='/Users/sn0wfree/Dropbox/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/slpit/item.txt'
     #rewards_collect=publicpath+'/url%srewards.txt'
     saving_file = publicpath+'/url%d/project_data.csv'%a
-        #index_value20='/Users/sn0wfree/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_value.txt',
-        #index_keys20='/Users/sn0wfree/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_keys.txt'
+        #index_value20='/Users/sn0wfree/Dropbox/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_value.txt',
+        #index_keys20='/Users/sn0wfree/Dropbox/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_keys.txt'
     target_url_file= publicpath+'/url%d/url%d.txt'%(a,a)
     have_collected_url= publicpath+'/url%d/collected.txt'%a
     return rewards_backers_distribution,rewards_pledge_limit,rewards_pledged_amount,saving_file,target_url_file,have_collected_url
@@ -62,7 +62,7 @@ total_rewards_pledged_amount=[]
 
 
 print 'begin to create/read index file'
-publicpath='/Users/sn0wfree/BitTorrentSync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/split'
+publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/split'
 #112
 
 
@@ -108,7 +108,7 @@ for e in xrange(a,c):
             funcforkick.collected_list_overwrite(collected,have_collected_url)
                 #funcforkick.projetcdata_txt_wholewrite(item,item_collect)
                 #funcforkick.projetcdata_txt_wholewrite(rewards,rewards_collect)
-                #funcforkick.index_write(index,'/Users/sn0wfree/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_value.txt','/Users/sn0wfree/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_keys.txt')
+                #funcforkick.index_write(index,'/Users/sn0wfree/Dropbox/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_value.txt','/Users/sn0wfree/Dropbox/BitTorrent Sync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/test/index_keys.txt')
             funcforkick.writeacsvprocess(saving_file,item_headers,total_item)
             funcforkick.writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
             funcforkick.writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)

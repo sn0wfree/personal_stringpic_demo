@@ -1,6 +1,7 @@
 
 import multiprocessing as mp
 import sys
+import zipfile
 import datetime
 import time
 import threading
@@ -10,14 +11,23 @@ from urllib2 import Request, urlopen, URLError
 import urllib2
 import requests
 from lxml import etree
-import datetime
 import pickle
 import os
 import unicodecsv
 import csv
-
-
-
+import smtplib
+import mimetypes
+import email.mime.text
+from email.mime.multipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email.MIMEText import MIMEText
+from email.MIMEAudio import MIMEAudio
+from email.MIMEImage import MIMEImage
+from email import encoders
+from email.utils import parseaddr, formataddr
+from email.header import Header
+from email.Encoders import encode_base64
+from email.utils import COMMASPACE
 
 
 def zipafilefordelivery(file,target):
@@ -206,7 +216,10 @@ def compareindexprocess(url):
             the_page1=0
     else:
         ID=0
-        state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
+        if len(sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state'))!=0:
+            state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
+        else:
+            state = 'Error'
         for line in the_page1:
             if 'data'  in line:
                 words = line.split('" ')
@@ -1088,6 +1101,66 @@ def filepathcollection(publicpath,url_file):
     target_url_file= publicpath+ url_file
     have_collected_url= publicpath+'/collected.txt'
     return rewards_backers_distribution,rewards_pledge_limit,rewards_pledged_amount,saving_file,target_url_file,have_collected_url
+def getAttachment(attachmentFilePath):
+    contentType, encoding = mimetypes.guess_type(attachmentFilePath)
+
+    if contentType is None or encoding is not None:
+        contentType = 'application/octet-stream'
+
+    (mainType, subType) = contentType.split('/', 1)
+    with open(attachmentFilePath, 'r') as file:
+        if mainType == 'text':
+            attachment = MIMEText(file.read())
+        elif mainType == 'message':
+            attachment = email.message_from_file(file)
+        elif mainType == 'image':
+            attachment = MIMEImage(file.read(),_subType=subType)
+        elif mainType == 'audio':
+            attachment = MIMEAudio(file.read(),_subType=subType)
+        else:
+            attachment = MIMEBase(mainType, subType)
+        attachment.set_payload(file.read())
+
+    encode_base64(attachment)
+
+    attachment.add_header('Content-Disposition', 'attachment',filename=os.path.basename(attachmentFilePath))
+    return attachment
+def sendmailtodelivery(mail_username,mail_password,to_addrs,*attachmentFilePaths):
+    from_addr = mail_username
+    # HOST & PORT
+    HOST = 'smtp.gmail.com'
+    PORT = 25
+    # Create SMTP Object
+    smtp = smtplib.SMTP()
+    #print 'connecting ...'
+
+    # show the debug log
+    smtp.set_debuglevel(1)
+
+    # connet
+    try:
+        print smtp.connect(HOST,PORT)
+    except:
+        print 'CONNECT ERROR ****'
+    # gmail uses ssl
+    smtp.starttls()
+    # login with username & password
+    try:
+        #print 'loginning ...'
+        smtp.login(mail_username,mail_password)
+    except:
+        print 'LOGIN ERROR ****'
+    # fill content with MIMEText's object
+    msg = MIMEMultipart()
+    for attachmentFilePath in attachmentFilePaths:
+        msg.attach(getAttachment(attachmentFilePath))
+    msg.attach(email.mime.text.MIMEText('data collecting process has completed at %s and here is the data file'% now,'plain', 'utf-8'))
+    msg['From'] = from_addr
+    msg['To'] = ';'.join(to_addrs)
+    msg['Subject']='data collecion completed'
+    #print msg.as_string()
+    smtp.sendmail(from_addr,to_addrs,msg.as_string())
+    smtp.quit()
 
 
 #a=input('the beginning collecting subjob is from ath :')
@@ -1156,26 +1229,10 @@ def datacollectprocess(someurl):
     #sys.stdout.write("\rthis spider has already read %d projects" % (counts))
     sys.stdout.flush()
 
-
-#for e in xrange(a,c):
-    #print '\n   subjobs %s begin!'%e
-#ppservers = ()
-
 total_item=[]
 total_rewards_backers_distribution=[]
 total_rewards_pledge_limit=[]
 total_rewards_pledged_amount=[]
-
-#if len(sys.argv) > 1:
-#    ncpus = int(sys.argv[1])
-    # Creates jobserver with ncpus workers
-#    job_server = pp.Server(ncpus, ppservers=ppservers)
-#else:
-    # Creates jobserver with automatically detected number of workers
-#    job_server = pp.Server(ppservers=ppservers)
-
-
-
 
 queue = Queue.Queue()
 class ThreadClass(threading.Thread):
@@ -1189,8 +1246,6 @@ class ThreadClass(threading.Thread):
             datacollectprocess(target)
             #time.sleep(1/10)
             self.queue.task_done()
-
-
 
 def main(file,y):
 
@@ -1226,16 +1281,25 @@ print  '\nsubjobs completed!'
 time.sleep(1)
 
 
-
-
-        #reset list
-        #time.sleep(1)
-#index_write(index,index_value20,index_keys20)
 print 'saving process completed'
-target=  publicpath +'/projectdata.csv'
-now =  datetime.date.today()
-pathfile=publicpath+ '%s.zip'%now
+target=  publicpath +'/project_data.csv'
+now =  datetime.datetime.today()
+pathfile=publicpath+ '/%s.zip' % now
+print 'compress process completed'
 zipafilefordelivery(pathfile,target)
+
+print 'begin sending email'
+mail_username='linlu19920815@gmail.com'
+mail_password='19920815'
+to_addrs=('snowfreedom0815@gmail.com')
+attachmentFilePaths=pathfile
+sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
+print 'email sent'
+
+
+
+
+
 
 #end = time.time()
 #print end-start

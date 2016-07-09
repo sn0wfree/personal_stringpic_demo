@@ -119,7 +119,6 @@ def twittercollectingprocess(keywords,launched_at,Deadline):
             queries, tweets_seen = current_ts_instance.get_statistics()
             if queries > 0 and (queries % 5) == 0: # trigger delay every 5th query
                 time.sleep(60) # sleep for 60 seconds
-        print "Time: {0} / Used Cache: {1}".format(now, response.from_cache)
 
          # this is where the fun actually starts :)
         for tweet in ts.search_tweets_iterable(tso, callback=my_callback_closure):

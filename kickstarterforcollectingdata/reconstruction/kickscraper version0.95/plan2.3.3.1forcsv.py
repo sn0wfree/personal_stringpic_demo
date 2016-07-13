@@ -28,7 +28,7 @@ from email.utils import parseaddr, formataddr
 from email.header import Header
 from email.Encoders import encode_base64
 from email.utils import COMMASPACE
-
+import pandas as pd
 
 def zipafilefordelivery(file,target):
     with zipfile.ZipFile(file, 'w',zipfile.ZIP_DEFLATED) as z:
@@ -36,22 +36,32 @@ def zipafilefordelivery(file,target):
         z.close
 
 
+def readacsv(file):
+    with open(file,'r+') as f:
+        w=pd.read_csv(file,skip_footer=1,engine='python')
+    return w
 def read_url_file(file):
     with open (file,'r') as file_unclear_file:
         file_unclear = []
         file_unclear_list =file_unclear_file.readlines()
-        #for x in file_unclear_list:
-            #print x
+        for x in file_unclear_list:
+
+            a=x.split()
+            if a==[]:
+                file_unclear.append(a)
+            else:
+                file_unclear.append(a[0])
+
 
             #print x
             #file_unclear.appen(x)
-        return file_unclear_list
+        return file_unclear
 def projetcdata_txt_write(item,file):
     f= open(file,'a')
     lenitem=len(item)
     if lenitem>1:
         for i in xrange(0,lenitem):
-            f.write(item[i])
+            f.write(item[i]+'\n')
     f.close()
 def projetcdata_txt_wholewrite(item,file):
     f= open(file,'a')
@@ -66,7 +76,7 @@ def collected_list_overwrite(item,file):
     f = open (file,'w')
     lenitem=len(item)
     for i in xrange(0,lenitem):
-        f.write(item[i])
+        f.write(item[i]+'\n')
     f.close()
 def writeafile(x,file):
     f=open(file,'a+')
@@ -141,31 +151,34 @@ def rewardsseperategenerateprocess(rewards):
     rewards_backers_distribution_dict={}
     rewards_pledge_limit_dict={}
     rewards_pledged_amount_dict={}
-    rewards_backers_distribution = rewards['rewards_backers_level_distribution']
-    rewards_pledge_limit =rewards['pledge_limit']
-    rewards_pledged_amount = rewards['rewards_level_divided_by_goal']
-    lenrewards_backers_distribution=len(rewards_backers_distribution)
-    rewards_backers_distribution_dict['Project_ID']=rewards['Project_ID']
-    rewards_pledge_limit_dict['Project_ID']=rewards['Project_ID']
-    rewards_pledged_amount_dict['Project_ID']=rewards['Project_ID']
-    if lenrewards_backers_distribution<50:
-        for i in xrange(lenrewards_backers_distribution):
-            if i<len(rewards_backers_distribution):
-                rewards_backers_distribution_dict['%s' %i]=rewards_backers_distribution[i]
-            else:
-                rewards_backers_distribution_dict['%s' %i]='0'
-            if i<len(rewards_pledge_limit):
-                rewards_pledge_limit_dict['%s' %i]=rewards_pledge_limit[i]
-            else:
-                rewards_pledge_limit_dict['%s' %i]='0'
-            if i<len(rewards_pledged_amount):
-                rewards_pledged_amount_dict['%s' %i]=rewards_pledged_amount[i]
-            else:
-                rewards_pledged_amount_dict['%s' %i]='0'
-    else:
-        rewards_pledged_amount_dict={}
-        rewards_pledge_limit_dict={}
-        rewards_backers_distribution_dict={}
+    if rewards!={}:
+        rewards_backers_distribution = rewards['rewards_backers_level_distribution']
+        rewards_pledge_limit =rewards['pledge_limit']
+        rewards_pledged_amount = rewards['rewards_level_divided_by_goal']
+        lenrewards_backers_distribution=len(rewards_backers_distribution)
+        rewards_backers_distribution_dict['Project_ID']=rewards['Project_ID']
+        rewards_pledge_limit_dict['Project_ID']=rewards['Project_ID']
+        rewards_pledged_amount_dict['Project_ID']=rewards['Project_ID']
+        if lenrewards_backers_distribution<50:
+            for i in xrange(lenrewards_backers_distribution):
+                if i<len(rewards_backers_distribution):
+                    rewards_backers_distribution_dict['%s' %i]=rewards_backers_distribution[i]
+                else:
+                    rewards_backers_distribution_dict['%s' %i]='0'
+                if i<len(rewards_pledge_limit):
+                    rewards_pledge_limit_dict['%s' %i]=rewards_pledge_limit[i]
+                else:
+                    rewards_pledge_limit_dict['%s' %i]='0'
+                if i<len(rewards_pledged_amount):
+                    rewards_pledged_amount_dict['%s' %i]=rewards_pledged_amount[i]
+                else:
+                    rewards_pledged_amount_dict['%s' %i]='0'
+        else:
+            rewards_pledged_amount_dict={}
+            rewards_pledge_limit_dict={}
+            rewards_backers_distribution_dict={}
+
+
 
 
     return rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict
@@ -173,7 +186,6 @@ def datagenerateprocess(url,state,sel,the_page1):
     someurl=''.join(url.split())
     if state != 'Error':
         if state == 'live':
-
             (item,rewards,ID,state)=webscraper_live(someurl,sel,the_page1)
         else:
             if state == 'successful':
@@ -314,14 +326,14 @@ def webscraper_successed(someurl,a,the_page):
         if hasattr(e, 'reason'):
             print 'We failed to reach a server.'
             print 'Reason: ', e.reason
-            item={}
+            item={'Project_ID':0,'project_state':'Error'}
             rewards={}
             ID=0
             state='Error'
         elif hasattr(e, 'code'):
             print 'The server couldn\'t fulfill the request.'
             print 'Error code: ', e.code
-            item={}
+            item={'Project_ID':0,'project_state':'Error'}
             rewards={}
             ID=0
             state='Error'
@@ -339,15 +351,15 @@ def webscraper_successed(someurl,a,the_page):
             if 'created_at&quot;:' in line:
                 words = line.split(',&quot;')
                 for word in words:
-                    if 'created_at&quot;:' in word:
+                    if 'created_at' in word:
                         created_at_str = word.split('&quot;:')[1]
             #state_changed_at
-            if '&quot;state_changed_at&quot' in line:
+            if 'state_changed_at&quot' in line:
                 words = line.split(',&quot;')
                 for word in words:
-                    if 'state_changed_at&quot;:' in word:
+                    if 'state_changed_at' in word:
                         state_changed_at_str= word.split('&quot;:')[1]
-            if '&quot;launched_at&quot;:' in line:
+            if 'launched_at&quot;:' in line:
                 words = line.split(',&quot;')
                 for word in words:
                     if 'launched_at&quot;:' in word:
@@ -562,8 +574,8 @@ def webscraper_successed(someurl,a,the_page):
         item[ 'creator_personal_url']= creator_personal_url_s
         item[ 'creator_bio_info_url']=''.join(creator_bio_info_url)
         item[ 'creator_full_name']=''.join(creator_full_name).strip()
-        item[ 'creator_built_projects_number']= creator_buildhistory_has_built_projects_number
-        item[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
+        item[ 'creator_has_built_projects_number']= creator_buildhistory_has_built_projects_number
+        item[ 'creator_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
         item[ 'creator_friends_facebook_number' ]=''.join(creator_friends__facebook_number)
         item[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
         item[ 'updates_number']=''.join(updates)
@@ -595,7 +607,7 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
                     if 'data class="Project' in word:
                         project_ID_str = word.split('Project')[1]
             #created_at/setupdate
-            if '&quot;created_at&quot;:' in line:
+            if 'created_at&quot;:' in line:
                 words = line.split(',&quot;')
                 for word in words:
                     if 'created_at' in word:
@@ -822,8 +834,8 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
         projectitem[ 'creator_personal_url']=''.join(creator_personal_url)
         projectitem[ 'creator_bio_info_url']=''.join(creator_bio_info_url)
         projectitem[ 'creator_full_name']=''.join(creator_full_name)
-        projectitem[ 'creator_built_projects_number']=creator_buildhistory_has_built_projects_number
-        projectitem[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
+        projectitem[ 'creator_has_built_projects_number']=creator_buildhistory_has_built_projects_number
+        projectitem[ 'creator_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
         projectitem[ 'creator_friends_facebook_number' ]=''.join(creator_friends__facebook_number)
         projectitem[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
         projectitem[ 'updates_number']=''.join(updates)
@@ -881,7 +893,7 @@ def webscraper_live(someurl,sel,the_page1):
             if '&quot;launched_at&quot;:' in line:
                 words = line.split(',&quot;')
                 for word in words:
-                    if 'launched_at&quot;:' in word:
+                    if 'launched_at' in word:
                         launched_at_str= word.split('&quot;:')[1]
         #location_id
         #createddate/set up date
@@ -1000,24 +1012,39 @@ def webscraper_live(someurl,sel,the_page1):
         creator_bio_info_sel= etree.HTML(creator_bio_info)
         creator_full_name = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[1]/span/span[2]/text()')
         #creator_buildhistory
+        creator_personal_url = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[1]/div[2]/ul/li/a/@href')
+        #print ccccc
+        creator_Facebook_url=creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[*]/span[2]/a/@href')
+
+
+        creator_friends__facebook_number_potential_list = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]//text()')
+        #print creator_friends__facebook_number_potential_list
+
+        creator_friends__facebook_number_potential=[]
+        for words in creator_friends__facebook_number_potential_list:
+            if words !='\n' and words!='\n\n':
+                creator_friends__facebook_number_potential.append(words)
+        #print creator_friends__facebook_number_potential
+        if not 'Last login' in creator_friends__facebook_number_potential[0]:
+            creator_short_name=creator_friends__facebook_number_potential[0]
+        else:
+            creator_short_name=[]
+        creator_buildhistory_has_built_projects_number='null'
+        creator_buildhistory_has_backed_projects_number='null'
+        creator_friends__facebook_number = 'Not connected'
+        for word in creator_friends__facebook_number_potential:
+            if 'created' in word:
+                creator_buildhistory_has_built_projects_number=word
+            if 'backed' in word:
+                creator_buildhistory_has_backed_projects_number=word
+            if 'friend' in word:
+                creator_friends__facebook_number= word
+        creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
+        #print creator_friends__facebook_number_potential_list,creator_friends__facebook_number_potential,type(creator_friends__facebook_number_potential)
+
 
                                                                                       #//*[@id="bio"]/div/div[2]/div[4]/a
-        creator_buildhistory_has_backed_projects_number = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[4]/a/text()')
-                                                                                    #//*[@id="bio"]/div/div[2]/div[4]/text()
-        creator_buildhistory_has_built_projects_number = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[4]/text()')
-        built_projects_number_list = creator_buildhistory_has_built_projects_number
-        backed_projects_number_list = creator_buildhistory_has_backed_projects_number
-        creator_buildhistory_has_built_projects_number = "".join(built_projects_number_list).strip()
-        creator_buildhistory_has_backed_projects_number = "".join(backed_projects_number_list).strip()
-        #facebook information
-        creator_friends__facebook_number_potential = str(creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/text()'))
-        if 'Not connected' in creator_friends__facebook_number_potential:
-            creator_friends__facebook_number = 'Not connected'
-            creator_Facebook_url = 'Not connected'
-        else:
-            creator_Facebook_url= creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/span[2]/a//@href')
-            creator_friends__facebook_number = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[3]/span[2]/a/text()')
-            #creator_friends__facebook_number = ''.join(creator_friends__facebook_number_str)
+
 
         state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
         deadline_date= ''.join(deadline_xpath)
@@ -1060,8 +1087,8 @@ def webscraper_live(someurl,sel,the_page1):
         projectitem[ 'creator_personal_url']=''.join(creator_personal_url)
         projectitem[ 'creator_bio_info_url']=''.join(creator_bio_info_url)
         projectitem[ 'creator_full_name']=''.join(creator_full_name)
-        projectitem[ 'creator_built_projects_number']=creator_buildhistory_has_built_projects_number
-        projectitem[ 'creator_buildhistory_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
+        projectitem[ 'creator_has_built_projects_number']=creator_buildhistory_has_built_projects_number
+        projectitem[ 'creator_has_backed_projects_number']=creator_buildhistory_has_backed_projects_number
         projectitem[ 'creator_friends_facebook_number' ]=''.join(creator_friends__facebook_number)
         projectitem[ 'creator_Facebook_url' ]=''.join(creator_Facebook_url)
         projectitem[ 'updates_number']=''.join(updates)
@@ -1087,6 +1114,14 @@ def createurl(target_url_file,have_collected_url):
     file_lsit=list(set(url_list)-set(collected))
     file = list(set(file_lsit))
     return file,collected
+def createurlfromcsv(target_url_file_csv,have_collected_url):
+    target_url_file=readacsv(target_url_file_csv)
+    url_list =target_url_file['url']
+    collected_unclear=read_url_file(have_collected_url)
+    collected=list(set(collected_unclear))
+    file_lsit=list(set(url_list)-set(collected))
+    file = list(set(file_lsit))
+    return file,collected
 def filepathcollection(publicpath,url_file):
     #/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/total/collected.txt
     #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/total'
@@ -1101,6 +1136,7 @@ def filepathcollection(publicpath,url_file):
     target_url_file= publicpath+ url_file
     have_collected_url= publicpath+'/collected.txt'
     return rewards_backers_distribution,rewards_pledge_limit,rewards_pledged_amount,saving_file,target_url_file,have_collected_url
+
 def getAttachment(attachmentFilePath):
     contentType, encoding = mimetypes.guess_type(attachmentFilePath)
 
@@ -1201,7 +1237,7 @@ def datacollectprocess(someurl):
         counts = counts + 1
         if item!={}:
             collected.append(someurl)
-        time.sleep(0.1)
+        time.sleep(0.3)
     if len(total_item)>50:
             #print rewards_backers_distribution
             #print rewards_pledge_limit,rewards_pledged_amount
@@ -1264,9 +1300,9 @@ print '\nsubjobs  begin!'
 rewards_headers=['Project_ID','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89']
 item_headers = ['Project_ID','project_name','Goal','url',
               'pledged_amount','backers_count','creator_full_name',
-              'creator_personal_url','creator_buildhistory_has_backed_projects_number','creator_built_projects_number',
+              'creator_personal_url','creator_has_backed_projects_number','creator_has_built_projects_number',
               'creator_bio_info_url','creator_Facebook_url','currency','duration','location_ID','state_changed_at','created_at','launched_at','Deadline','description','category','project_state','has_a_video','comments_count','updates_number','data_percent_rasied','hours_left','creator_short_name','creator_friends_facebook_number']
-(file,collected) = createurl(target_url_file,have_collected_url)
+(file,collected) = createurlfromcsv(target_url_file,have_collected_url)
 print 'begin to collecting data'
 print len(file)
 main(file,y)
@@ -1291,7 +1327,7 @@ zipafilefordelivery(pathfile,target)
 print 'begin sending email'
 mail_username='linlu19920815@gmail.com'
 mail_password='19920815'
-to_addrs=('snowfreedom0815@gmail.com')
+to_addrs="snowfreedom0815@gmail.com"
 attachmentFilePaths=pathfile
 sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
 print 'email sent'

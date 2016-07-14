@@ -200,8 +200,10 @@ def datagenerateprocess(url,state,sel,the_page1):
         state='Error'
     return item,rewards,ID,state
 def compareindexprocess(url):
-    if url!=[]:
+    if url!=[] and type(url)!=float:
         someurl =''.join(url.split())
+    else:
+        someurl='Error'
     try:
         response = Request(someurl)
         content = urllib2.urlopen(someurl).read()
@@ -226,6 +228,13 @@ def compareindexprocess(url):
             ID=0
             sel=0
             the_page1=0
+        else:
+            state='Error'
+            exist_code=0
+            ID=0
+            sel=0
+            the_page1=0
+
     else:
         ID=0
         if len(sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state'))!=0:
@@ -419,7 +428,7 @@ def webscraper_successed(someurl,a,the_page):
         #ship_location_info
         ship_location_info = ['0']*len(rewards_level_divided_by_goal)
 
-        for i in range(1,len(rewards_level_divided_by_goal)):
+        for i in xrange(1,len(rewards_level_divided_by_goal)):
             #print i
             c = str(i)
             #rewards_level_description
@@ -477,51 +486,72 @@ def webscraper_successed(someurl,a,the_page):
         creator_bio_info_url = root_url + ''.join(creator_bio_info_shorturl_list)
         #print creator_bio_info_url
         #turn to new creator_bio_websites
-        creator_bio_info = urllib2.urlopen(creator_bio_info_url).read()
-        creator_bio_info_sel= etree.HTML(creator_bio_info)
-        creator_full_name = creator_bio_info_sel.xpath('//*[@id="main_content"]/header/div/div/div[2]/h1/a/text()')
-        #creator_buildhistory
-        #print creator_full_name
-        creator_personal_url = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[1]/div[2]/ul/li/a/@href')
-        #print ccccc
-        creator_Facebook_url=creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[*]/span[2]/a/@href')
-        #
-        if ''.join(creator_personal_url)=='':
-            creator_personal_url_s=0
-        else:
-            creator_personal_url_s=''.join(creator_personal_url)
-
         comments_count=sel.xpath('//*[@id="content-wrap"]/div[2]/div/div/div/div[2]/a[4]/@data-comments-count')
 
-        creator_friends__facebook_number_potential_list = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]//text()')
-        #print creator_friends__facebook_number_potential_list
-
-        creator_friends__facebook_number_potential=[]
-        for words in creator_friends__facebook_number_potential_list:
-            if words !='\n' and words!='\n\n':
-                creator_friends__facebook_number_potential.append(words)
-        #print creator_friends__facebook_number_potential
-        if not 'Last login' in creator_friends__facebook_number_potential[0]:
-            creator_short_name=creator_friends__facebook_number_potential[0]
+        try:
+            creator_bio_info = urllib2.urlopen(creator_bio_info_url).read()
+            creator_bio_info_sel= etree.HTML(creator_bio_info)
+        except URLError as e:
+            if hasattr(e, 'reason'):
+                print 'We failed to reach a server.'
+                print 'Reason: ', e.reason
+                creator_full_name='Error'
+                #creator_personal_url='Error'
+                creator_Facebook_url='Error'
+                creator_short_name='Error'
+                creator_buildhistory_has_built_projects_number='null'
+                creator_buildhistory_has_backed_projects_number='null'
+                creator_friends__facebook_number = 'Error'
+                creator_personal_url_s='Error'
+            elif hasattr(e, 'code'):
+                print 'The server couldn\'t fulfill the request.'
+                print 'Error code: ', e.code
+                creator_full_name='Error'
+                #creator_personal_url='Error'
+                creator_Facebook_url='Error'
+                creator_short_name='Error'
+                creator_buildhistory_has_built_projects_number='null'
+                creator_buildhistory_has_backed_projects_number='null'
+                creator_friends__facebook_number = 'Error'
+                creator_personal_url_s='Error'
         else:
-            creator_short_name=[]
-        creator_buildhistory_has_built_projects_number='null'
-        creator_buildhistory_has_backed_projects_number='null'
-        creator_friends__facebook_number = 'Not connected'
-        for word in creator_friends__facebook_number_potential:
-            if 'created' in word:
-                creator_buildhistory_has_built_projects_number=word
-            if 'backed' in word:
-                creator_buildhistory_has_backed_projects_number=word
-            if 'friend' in word:
-                creator_friends__facebook_number= word
-        creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
-        #print creator_friends__facebook_number_potential_list,creator_friends__facebook_number_potential,type(creator_friends__facebook_number_potential)
 
-        #turn to new websites
+            creator_full_name = creator_bio_info_sel.xpath('//*[@id="main_content"]/header/div/div/div[2]/h1/a/text()')
+                    #creator_buildhistory
+                    #print creator_full_name
+            creator_personal_url = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[1]/div[2]/ul/li/a/@href')
+                    #print ccccc
+            creator_Facebook_url=creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[*]/span[2]/a/@href')
+            if ''.join(creator_personal_url)=='':
+                creator_personal_url_s='Error'
+            else:
+                creator_personal_url_s=''.join(creator_personal_url)
+            creator_friends__facebook_number_potential_list = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]//text()')
+            creator_friends__facebook_number_potential=[]
+            #print creator_friends__facebook_number_potential_list
+            for words in creator_friends__facebook_number_potential_list:
+                if words !='\n' and words!='\n\n':
+                    creator_friends__facebook_number_potential.append(words)
+            #print creator_friends__facebook_number_potential
+            if not 'Last login' in creator_friends__facebook_number_potential[0]:
+                creator_short_name=creator_friends__facebook_number_potential[0]
+            else:
+                creator_short_name=[]
+            creator_buildhistory_has_built_projects_number='null'
+            creator_buildhistory_has_backed_projects_number='null'
+            creator_friends__facebook_number = 'Not connected'
+            for word in creator_friends__facebook_number_potential:
+                if 'created' in word:
+                    creator_buildhistory_has_built_projects_number=word
+                if 'backed' in word:
+                    creator_buildhistory_has_backed_projects_number=word
+                if 'friend' in word:
+                    creator_friends__facebook_number= word
+                #creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
+                #print creator_friends__facebook_number_potential_list,creator_friends__facebook_number_potential,type(creator_friends__facebook_number_potential)
+
         #new data form
         state_other=sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')
-
         #data_structure_change
         deadline_date= ''.join(deadline_xpath)
         backers_count_str = ''.join(backers_count)
@@ -531,15 +561,12 @@ def webscraper_successed(someurl,a,the_page):
         data_percent_rasied_str = ''.join(data_percent_rasied)
         hours_left_str = ''.join(hours_left)
         item = {}
-        #pledged = ''
-        #state_changed_at = ''
-        #comments_count = ''
-        #id = ''
+
         item['project_name'] = project_name
         #item[ 'project_name']= project_name
         item[ 'location_ID']= location_id
         item[ 'Project_ID']= project_ID
-        item['duration'] =0
+        item['duration'] =data_duration
         item['has_a_video'] =''.join(video)
         #print 'Project ID', id
         state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
@@ -565,12 +592,12 @@ def webscraper_successed(someurl,a,the_page):
         item[ 'Goal']= goal_seek
         item[ 'pledged_amount']=pledged_amount_str
         item[ 'data_percent_rasied']= 0
-        item[ 'currency']= 0
+        item[ 'currency']= currency
         item[ 'hours_left']= 0
         #print 'day_left', day_left
 
         item[ 'description']=''.join(description).strip('\n')
-        item[ 'creator_short_name']= creator_short_name_s
+        item[ 'creator_short_name']= creator_short_name
         item[ 'creator_personal_url']= creator_personal_url_s
         item[ 'creator_bio_info_url']=''.join(creator_bio_info_url)
         item[ 'creator_full_name']=''.join(creator_full_name).strip()
@@ -596,7 +623,32 @@ def webscraper_successed(someurl,a,the_page):
 
 def webscraper_failorcanceled(someurl,sel,the_page1):
     root_url = 'https://www.kickstarter.com'
-    if len(someurl) > 1:
+    try:
+        creator_bio_info_shorturl_list = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/p/a[1]//@href')
+        #                                           //*[@id="content-wrap"]/section/div[2]/div[2]/div/div/div[2]/div[3]/div[2]/div[1]/div/div[2]/div[1]/a
+        #print creator_bio_info_shorturl_list
+        #                                sel.xpath('//*[@id="content-wrap"]/section/div[2]/div[2]/div/div/div[2]/div[3]/div[2]/div[1]/div/div[2]/div[1]/a/@href')
+        creator_bio_info_url = root_url + ''.join(creator_bio_info_shorturl_list)
+        #print creator_bio_info_url
+        #turn to new creator_bio_websites
+        creator_bio_info = urllib2.urlopen(creator_bio_info_url).read()
+        creator_bio_info_sel= etree.HTML(creator_bio_info)
+    except URLError as e:
+        if hasattr(e, 'reason'):
+            print 'We failed to reach a server.'
+            print 'Reason: ', e.reason
+            item={'Project_ID':0,'project_state':'Error'}
+            rewards={}
+            ID=0
+            state='Error'
+        elif hasattr(e, 'code'):
+            print 'The server couldn\'t fulfill the request.'
+            print 'Error code: ', e.code
+            item={'Project_ID':0,'project_state':'Error'}
+            rewards={}
+            ID=0
+            state='Error'
+    else:
         project_name_str = sel.xpath('//*[@id="content-wrap"]/section/div[1]/div/h2/a/text()')
         project_name = ''.join(project_name_str).strip('\n')
         for line in the_page1:
@@ -682,7 +734,7 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
         #ship_info
 
         #pledge_limit
-        for i in range(1,len(rewards_level_divided_by_goal)):
+        for i in xrange(1,len(rewards_level_divided_by_goal)):
             #print i
             c = str(i)
             #rewards_level_description
@@ -732,15 +784,7 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
         #creator_url
         creator_personal_url = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/div[3]/div/div[2]/p/a//@href')
         #creator_bio_info
-        creator_bio_info_shorturl_list = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/p/a[1]//@href')
-        #                                           //*[@id="content-wrap"]/section/div[2]/div[2]/div/div/div[2]/div[3]/div[2]/div[1]/div/div[2]/div[1]/a
-        #print creator_bio_info_shorturl_list
-        #                                sel.xpath('//*[@id="content-wrap"]/section/div[2]/div[2]/div/div/div[2]/div[3]/div[2]/div[1]/div/div[2]/div[1]/a/@href')
-        creator_bio_info_url = root_url + ''.join(creator_bio_info_shorturl_list)
-        #print creator_bio_info_url
-        #turn to new creator_bio_websites
-        creator_bio_info = urllib2.urlopen(creator_bio_info_url).read()
-        creator_bio_info_sel= etree.HTML(creator_bio_info)
+
         creator_full_name = creator_bio_info_sel.xpath('//*[@id="main_content"]/header/div/div/div[2]/h1/a/text()')
         #creator_buildhistory
         #print creator_full_name
@@ -777,7 +821,7 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
                 creator_buildhistory_has_backed_projects_number=word
             if 'friend' in word:
                 creator_friends__facebook_number= word
-        creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
+        #creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
         #print creator_friends__facebook_number_potential_list,creator_friends__facebook_number_potential,type(creator_friends__facebook_number_potential)
 
         #new data form
@@ -856,7 +900,29 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
 
 def webscraper_live(someurl,sel,the_page1):
     root_url = 'https://www.kickstarter.com'
-    if len(someurl) > 1:
+    try:
+
+        creator_bio_info_shorturl_list = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/p/a[1]//@href')
+        creator_bio_info_url = root_url + ''.join(str(x) for x in creator_bio_info_shorturl_list)
+        #turn to new creator_bio_websites
+        creator_bio_info = urllib2.urlopen(creator_bio_info_url).read()
+        creator_bio_info_sel= etree.HTML(creator_bio_info)
+    except URLError as e:
+        if hasattr(e, 'reason'):
+            print 'We failed to reach a server.'
+            print 'Reason: ', e.reason
+            item={'Project_ID':0,'project_state':'Error'}
+            rewards={}
+            ID=0
+            state='Error'
+        elif hasattr(e, 'code'):
+            print 'The server couldn\'t fulfill the request.'
+            print 'Error code: ', e.code
+            item={'Project_ID':0,'project_state':'Error'}
+            rewards={}
+            ID=0
+            state='Error'
+    else:
         project_name_str = sel.xpath('//*[@id="content-wrap"]/section/div[1]/div/h2/a/text()')
         project_name = ''.join(project_name_str).strip('\n')
         for line in the_page1:
@@ -954,7 +1020,7 @@ def webscraper_live(someurl,sel,the_page1):
         #rewards_level_description
         #ship_info
         #pledge_limit
-        for i in range(1,len(rewards_level_divided_by_goal)):
+        for i in xrange(1,len(rewards_level_divided_by_goal)):
             #print i
             c = str(i)
             #rewards_level_description
@@ -989,11 +1055,11 @@ def webscraper_live(someurl,sel,the_page1):
             pledge_limit_split =''.join(pledge_limit_split)
             pledge_limit.append(pledge_limit_split)
             #ship_location_info
-            ship_location_info_split_list = sel.xpath(ship_location_info_a)
-            ship_location_info_split = ship_location_info_split_list
+            #ship_location_info_split_list = sel.xpath(ship_location_info_a)
+            #ship_location_info_split = ship_location_info_split_list
             #print ship_location_info_split, ship_location_info_split_list
-            ship_location_info_split =''.join(ship_location_info_split)
-            ship_location_info_split= str(ship_location_info_split)
+            #ship_location_info_split =''.join(ship_location_info_split)
+            #ship_location_info_split= str(ship_location_info_split)
             #ship_location_info[i-1] = ship_location_info_split
         deadline_xpath= sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[1]/div/div/p/time/text()')
         #project_description
@@ -1005,11 +1071,7 @@ def webscraper_live(someurl,sel,the_page1):
         #creator_url
         creator_personal_url = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/div[3]/div/div[2]/p/a//@href')
         #creator_bio_info
-        creator_bio_info_shorturl_list = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[6]/div/div[2]/div[2]/p/a[1]//@href')
-        creator_bio_info_url = root_url + ''.join(str(x) for x in creator_bio_info_shorturl_list)
-        #turn to new creator_bio_websites
-        creator_bio_info = urllib2.urlopen(creator_bio_info_url).read()
-        creator_bio_info_sel= etree.HTML(creator_bio_info)
+
         creator_full_name = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[2]/div[1]/span/span[2]/text()')
         #creator_buildhistory
         creator_personal_url = creator_bio_info_sel.xpath('//*[@id="bio"]/div/div[1]/div[2]/ul/li/a/@href')
@@ -1043,7 +1105,7 @@ def webscraper_live(someurl,sel,the_page1):
         #print creator_friends__facebook_number_potential_list,creator_friends__facebook_number_potential,type(creator_friends__facebook_number_potential)
 
 
-                                                                                      #//*[@id="bio"]/div/div[2]/div[4]/a
+         #//*[@id="bio"]/div/div[2]/div[4]/a
 
 
         state = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/@data-project-state')[0]
@@ -1221,7 +1283,7 @@ def datacollectprocess(someurl):
         counts = counts + 1
         if item!={}:
             collected.append(someurl)
-        time.sleep(0.2+len(total_item)/40)
+        time.sleep(1+len(total_item)/50)
     if len(total_item)>50:
             #print rewards_backers_distribution
             #print rewards_pledge_limit,rewards_pledged_amount
@@ -1249,7 +1311,7 @@ def datacollectprocess(someurl):
     #sys.stdout.write("\rthis spider has already read %d projects" % (counts))
     sys.stdout.flush()
 
-    
+
 def main(file,y):
 
     for j in xrange(y):

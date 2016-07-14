@@ -1198,22 +1198,6 @@ def sendmailtodelivery(mail_username,mail_password,to_addrs,*attachmentFilePaths
     smtp.sendmail(from_addr,to_addrs,msg.as_string())
     smtp.quit()
 
-
-#a=input('the beginning collecting subjob is from ath :')
-#b=input('the gap for I/O is:')
-#c=input('the subjob will end at Job?( max 112):')
-y=input('choose the number of workers for this jobs:')
-publicpath=input('please enter the document path for saving file:')
-#publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterforcollectingdata/reconstruction/test'
-url_file=input ('please enter the target url file for starting,need add /:')
-#url_file='/1.txt'
-gc.enable()
-
-global counts
-counts = 0
-#setup multicore system
-#job_server = pp.Server()
-#print 'begin to create/read index file'
 def datacollectprocess(someurl):
     global total_item
     global total_rewards_backers_distribution
@@ -1265,12 +1249,17 @@ def datacollectprocess(someurl):
     #sys.stdout.write("\rthis spider has already read %d projects" % (counts))
     sys.stdout.flush()
 
-total_item=[]
-total_rewards_backers_distribution=[]
-total_rewards_pledge_limit=[]
-total_rewards_pledged_amount=[]
+    
+def main(file,y):
 
-queue = Queue.Queue()
+    for j in xrange(y):
+        t = ThreadClass(queue)
+        t.setDaemon(True)
+        t.start()
+    for someurl in file:
+
+        queue.put(someurl)
+    queue.join()
 class ThreadClass(threading.Thread):
     def __init__(self, queue):
         threading.Thread.__init__(self)
@@ -1283,54 +1272,70 @@ class ThreadClass(threading.Thread):
             #time.sleep(1/10)
             self.queue.task_done()
 
-def main(file,y):
-
-    for j in xrange(y):
-        t = ThreadClass(queue)
-        t.setDaemon(True)
-        t.start()
-    for someurl in file:
-
-        queue.put(someurl)
-    queue.join()
-
-print '\nsubjobs  begin!'
-(rewards_backers_distribution,rewards_pledge_limit,rewards_pledged_amount,saving_file,target_url_file,have_collected_url) = filepathcollection(publicpath,url_file)
-
-rewards_headers=['Project_ID','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89']
-item_headers = ['Project_ID','project_name','Goal','url',
-              'pledged_amount','backers_count','creator_full_name',
-              'creator_personal_url','creator_has_backed_projects_number','creator_has_built_projects_number',
-              'creator_bio_info_url','creator_Facebook_url','currency','duration','location_ID','state_changed_at','created_at','launched_at','Deadline','description','category','project_state','has_a_video','comments_count','updates_number','data_percent_rasied','hours_left','creator_short_name','creator_friends_facebook_number']
-(file,collected) = createurlfromcsv(target_url_file,have_collected_url)
-print 'begin to collecting data'
-print len(file)
-main(file,y)
-collected_list_overwrite(collected,have_collected_url)
-#(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=catchup(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
-writeacsvprocess(saving_file,item_headers,total_item)
-writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
-writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)
-writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
-counts=0
-print  '\nsubjobs completed!'
-time.sleep(1)
 
 
-print 'saving process completed'
-target=  publicpath +'/project_data.csv'
-now =  datetime.datetime.today()
-pathfile=publicpath+ '/%s.zip' % now
-print 'compress process completed'
-zipafilefordelivery(pathfile,target)
+if __name__ == '__main__':
+    #a=input('the beginning collecting subjob is from ath :')
+    #b=input('the gap for I/O is:')
+    #c=input('the subjob will end at Job?( max 112):')
+    y=input('choose the number of workers for this jobs:')
+    publicpath=input('please enter the document path for saving file:')
+    #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterforcollectingdata/reconstruction/test'
+    url_file=input ('please enter the target url file for starting,need add /:')
+    #url_file='/1.txt'
+    gc.enable()
 
-print 'begin sending email'
-mail_username='linlu19920815@gmail.com'
-mail_password='19920815'
-to_addrs="snowfreedom0815@gmail.com"
-attachmentFilePaths=pathfile
-sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
-print 'email sent'
+    global counts
+    counts = 0
+    #setup multicore system
+    #job_server = pp.Server()
+    #print 'begin to create/read index file'
+
+    total_item=[]
+    total_rewards_backers_distribution=[]
+    total_rewards_pledge_limit=[]
+    total_rewards_pledged_amount=[]
+
+    queue = Queue.Queue()
+
+    print '\nsubjobs  begin!'
+    (rewards_backers_distribution,rewards_pledge_limit,rewards_pledged_amount,saving_file,target_url_file,have_collected_url) = filepathcollection(publicpath,url_file)
+
+    rewards_headers=['Project_ID','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89']
+    item_headers = ['Project_ID','project_name','Goal','url',
+                  'pledged_amount','backers_count','creator_full_name',
+                  'creator_personal_url','creator_has_backed_projects_number','creator_has_built_projects_number',
+                  'creator_bio_info_url','creator_Facebook_url','currency','duration','location_ID','state_changed_at','created_at','launched_at','Deadline','description','category','project_state','has_a_video','comments_count','updates_number','data_percent_rasied','hours_left','creator_short_name','creator_friends_facebook_number']
+    (file,collected) = createurlfromcsv(target_url_file,have_collected_url)
+    print 'begin to collecting data'
+    print len(file)
+    main(file,y)
+    collected_list_overwrite(collected,have_collected_url)
+    #(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=catchup(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
+    writeacsvprocess(saving_file,item_headers,total_item)
+    writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
+    writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)
+    writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
+    counts=0
+    print  '\nsubjobs completed!'
+    time.sleep(1)
+
+
+    print 'saving process completed'
+    target=  publicpath +'/project_data.csv'
+    now =  datetime.datetime.today()
+    pathfile=publicpath+ '/%s.zip' % now
+    print 'compress process completed'
+    zipafilefordelivery(pathfile,target)
+
+    print 'begin sending email'
+    mail_username='linlu19920815@gmail.com'
+    mail_password='19920815'
+    to_addrs="snowfreedom0815@gmail.com"
+    attachmentFilePaths=pathfile
+    sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
+    print 'email sent'
+
 
 
 

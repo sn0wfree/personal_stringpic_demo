@@ -1237,7 +1237,7 @@ def datacollectprocess(someurl):
         counts = counts + 1
         if item!={}:
             collected.append(someurl)
-        time.sleep(0.3)
+        time.sleep(0.2+len(total_item)/40)
     if len(total_item)>50:
             #print rewards_backers_distribution
             #print rewards_pledge_limit,rewards_pledged_amount
@@ -1256,7 +1256,7 @@ def datacollectprocess(someurl):
         total_rewards_pledge_limit=[]
         total_rewards_pledged_amount=[]
         gc.collect()
-        time.sleep(y)
+        time.sleep(1)
             #time.sleep(1)
     f2 = time.time()
     w=(len(file)-counts)*(f2-f1)/60/y

@@ -1,3 +1,14 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright by Lin Lu 2016
+#-----------------------------------------------------------------------------------------------
+'''
+this code is for my dissertation.
+'''
+#-----------------------------------------------------------------------------------------------
+###
+
+
 import threading
 import Queue
 import kickspider

@@ -29,7 +29,6 @@ from twisted.enterprise import adbapi
 
 
 #someurl = 'https://www.kickstarter.com/projects/neliobarros/nixin-typeface?ref=discover_potd'
-someurl = 'https://www.kickstarter.com/projects/1060627644/35000-years-in-the-making-pens-made-from-ancient-k?ref=category_featured'
 
 def webscraper(someurl):
 
@@ -358,8 +357,9 @@ def kickgowebscraper(someurl):
 
     return kickstarter_projetc_data_item,kickstarter_projetc_data_rewards
 
+if __name__='__main__':
+    someurl = 'https://www.kickstarter.com/projects/1060627644/35000-years-in-the-making-pens-made-from-ancient-k?ref=category_featured'
 
-
-(kickstarter_projetc_data_item,kickstarter_projetc_data_rewards)= kickgowebscraper(someurl)
-print kickstarter_projetc_data_rewards
-print kickstarter_projetc_data_item
+    (kickstarter_projetc_data_item,kickstarter_projetc_data_rewards)= kickgowebscraper(someurl)
+    print kickstarter_projetc_data_rewards
+    print kickstarter_projetc_data_item

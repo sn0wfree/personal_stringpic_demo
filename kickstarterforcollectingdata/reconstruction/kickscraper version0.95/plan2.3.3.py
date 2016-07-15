@@ -1,4 +1,12 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright by Lin Lu
+#-----------------------------------------------------------------------------------------------
+'''
+this code is for my dissertation.
+'''
+#-----------------------------------------------------------------------------------------------
+###
 import multiprocessing as mp
 import sys
 import zipfile

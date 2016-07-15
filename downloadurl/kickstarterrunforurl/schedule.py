@@ -21,10 +21,10 @@ def progress_test():
     time.sleep(1)
 
 
-
-for i in xrange(1,54):
-    print 'initiating collecting data'
-    downloadurlauto.downloadforurl(i)
-    #print 'project %d has succesful porcess and do next' % i
-    #progress_test()
-    #print '%d have succesful porcess and do next' % i
+if __name__-'__main__':
+    for i in xrange(1,54):
+        print 'initiating collecting data'
+        downloadurlauto.downloadforurl(i)
+        #print 'project %d has succesful porcess and do next' % i
+        #progress_test()
+        #print '%d have succesful porcess and do next' % i

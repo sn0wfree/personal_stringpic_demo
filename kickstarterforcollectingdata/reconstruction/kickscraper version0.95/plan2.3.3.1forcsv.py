@@ -1,4 +1,12 @@
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Copyright by Lin Lu 2016
+#-----------------------------------------------------------------------------------------------
+'''
+this code is for my dissertation.
+'''
+#-----------------------------------------------------------------------------------------------
+###
 import multiprocessing as mp
 import sys
 import zipfile
@@ -1305,11 +1313,12 @@ def datacollectprocess(someurl):
         time.sleep(1)
             #time.sleep(1)
     f2 = time.time()
-    w=(len(file)-counts)*(f2-f1)/60/y
+    w=(len(file)-counts)*(f2-f1)/y
+    progress_test(counts,len(file),f2-f1,w)
             #conditional_insert(cursor, item)
-    sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects and remaining time: %.4f mins" % (counts,f2-f1,w))
+    #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects and remaining time: %.4f mins" % (counts,f2-f1,w))
     #sys.stdout.write("\rthis spider has already read %d projects" % (counts))
-    sys.stdout.flush()
+    #sys.stdout.flush()
 
 
 def main(file,y):
@@ -1334,16 +1343,35 @@ class ThreadClass(threading.Thread):
             #time.sleep(1/10)
             self.queue.task_done()
 
+def progress_test(counts,lenfile,speed,w):
+    bar_length=30
+    eta=time.time()+w
+    precent =counts/float(lenfile)
+    
+    ETA=datetime.datetime.fromtimestamp(eta).time()
+    hashes = '#' * int(precent * bar_length)
+    spaces = ' ' * (bar_length - len(hashes))
+    sys.stdout.write("""\r%d%%|%s|read %d projects|ETA: %s """ % (precent*100,hashes + spaces,counts,w))
+
+    #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects" % (counts,f2-f1))
+
+    #sys.stdout.write("\rPercent: [%s] %d%%,remaining time: %.4f mins"%(hashes + spaces,precent,w))
+    sys.stdout.flush()
+  #time.sleep()
+
 
 
 if __name__ == '__main__':
     #a=input('the beginning collecting subjob is from ath :')
     #b=input('the gap for I/O is:')
     #c=input('the subjob will end at Job?( max 112):')
-    y=input('choose the number of workers for this jobs:')
-    publicpath=input('please enter the document path for saving file:')
+    print '***********************************************************'
+    y=input('(1) choose the number of workers for this jobs:')
+    print '***********************************************************'
+    publicpath=input('(2) please enter the document path for saving file:')
+    print '=============================================================='
     #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterforcollectingdata/reconstruction/test'
-    url_file=input ('please enter the target url file for starting,need add /:')
+    url_file=input ('(3) please enter the target url file for starting,need add /:')
     #url_file='/1.txt'
     gc.enable()
 
@@ -1370,7 +1398,7 @@ if __name__ == '__main__':
                   'creator_bio_info_url','creator_Facebook_url','currency','duration','location_ID','state_changed_at','created_at','launched_at','Deadline','description','category','project_state','has_a_video','comments_count','updates_number','data_percent_rasied','hours_left','creator_short_name','creator_friends_facebook_number']
     (file,collected) = createurlfromcsv(target_url_file,have_collected_url)
     print 'begin to collecting data'
-    print len(file)
+    global file
     main(file,y)
     collected_list_overwrite(collected,have_collected_url)
     #(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=catchup(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
@@ -1380,7 +1408,7 @@ if __name__ == '__main__':
     writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
     counts=0
     print  '\nsubjobs completed!'
-    time.sleep(1)
+    time.sleep(0.1)
 
 
     print 'saving process completed'

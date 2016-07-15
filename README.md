@@ -37,9 +37,10 @@ after that, you can access all estblished or live projects (included canceled, f
 -PS: i will clean up those useless files when i finish my dissertation finally
 
 ## 3. codes
-- i use python 2.7 to code  
-- and when you run the code, you may find some number or path be required type in, you should type full path into two parts.
-- one is public path for what dir/folder you want save the data. the dir/folder must include 4 csv files and one txt file.(those must be named as follow)
+- I use python 2.7 to code  
+- and when you run the code, you may find some number or path be required to type in, you should type full path into two parts.
+	- one is public path for what dir/folder you want save the data. the dir/folder must include 4 csv files and one txt file.(those must be named as follow)
+	- another is the full name of target file(csv format) 
 
 
 ```		
@@ -49,12 +50,12 @@ rewards_backers_distribution.csv
 rewards_pledge_limit.csv
 rewards_pledged_amount.csv 				
 ```
-- and a csv file which must include the target urls
+-the target file  must include the target urls
 
 
 ___________________________I'm a line____________________________
 
-Wirtten by sn0wfree at 15 July 2016
+Wirtten by sn0wfree at 15 July 2016 Cardiff, UK
 
 	
 	

@@ -33,12 +33,12 @@ after that, you can access all estblished or live projects (included canceled, f
 	- sometime i may add more information follwoing veriong number for .py file,like add fortxt or forcsv.
 
 ## 2.files
-- you may found a lot of txt files and csv or xlsx files, that may somedata what data i have collected until 4 July 2016. 
-- i will clean up those useless files when i finish my dissertation finally
+- you may find a lot of txt files and csv or xlsx files, that are some data what i have collected until 4 July 2016. 
+-PS: i will clean up those useless files when i finish my dissertation finally
 
 ## 3. codes
-- i use python 2.7 code  
-- and when you run the code, you may find some number or path ask for, you should type full path into two parts.
+- i use python 2.7 to code  
+- and when you run the code, you may find some number or path be required type in, you should type full path into two parts.
 - one is public path for what dir/folder you want save the data. the dir/folder must include 4 csv files and one txt file.(those must be named as follow)
 
 
@@ -49,7 +49,7 @@ rewards_backers_distribution.csv
 rewards_pledge_limit.csv
 rewards_pledged_amount.csv 				
 ```
-- and a csv file which must include the target urls as column
+- and a csv file which must include the target urls
 
 
 ___________________________I'm a line____________________________

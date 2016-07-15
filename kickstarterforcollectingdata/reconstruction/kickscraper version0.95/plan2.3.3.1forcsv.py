@@ -1347,11 +1347,11 @@ def progress_test(counts,lenfile,speed,w):
     bar_length=30
     eta=time.time()+w
     precent =counts/float(lenfile)
-    
-    ETA=datetime.datetime.fromtimestamp(eta).time()
+
+    ETA=datetime.datetime.fromtimestamp(eta).datatime()
     hashes = '#' * int(precent * bar_length)
     spaces = ' ' * (bar_length - len(hashes))
-    sys.stdout.write("""\r%d%%|%s|read %d projects|ETA: %s """ % (precent*100,hashes + spaces,counts,w))
+    sys.stdout.write("""\r%d%%|%s|read %d projects|ETA: %s """ % (precent*100,hashes + spaces,counts,ETA))
 
     #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects" % (counts,f2-f1))
 

@@ -39,16 +39,19 @@ after that, you can access all estblished or live projects (included canceled, f
 ## 3. codes
 - I use python 2.7 to code  
 - and when you run the code, you may find some number or path be required to type in, you should type full path into two parts.
-	- one is public path for what dir/folder you want save the data. the dir/folder must include 4 csv files and one txt file.(those must be named as follow)
-```		
+	- one is public path for what dir/folder you want save the data. the dir/folder must include 4 csv files and one txt file.
+	- another is the full name of target file(csv format) 
+	- (those must be named as follow)
+```
+targetfile.csv
 collected.txt
 project_data.csv
 rewards_backers_distribution.csv
 rewards_pledge_limit.csv
 rewards_pledged_amount.csv 				
 ```
-- another is the full name of target file(csv format) 
--the target file  must include the target urls
+	
+-**the target file**  must include the target urls
 
 
 ___________________________I'm a line____________________________

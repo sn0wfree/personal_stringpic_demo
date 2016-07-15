@@ -27,7 +27,7 @@ after that, you can access all estblished or live projects (included canceled, f
 ### **kickstarterforcollectingdata**
 - this folder include main spider program
 - my version format is **name**+**version**.py
-- in the **kickstarterforcollectingdata** folder, you can find a **reconstruction** folder. 
+- in the **kickstarterforcollectingdata** folder, you can find a folder named **reconstruction** . 
 - any things you want all saving in this folder
 - and what you may interst is the plan2.3.3.py or the version bigger than 2.3.3
 	- sometime i may add more information follwoing veriong number for .py file,like add fortxt or forcsv.

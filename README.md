@@ -17,7 +17,7 @@ and the aim is for help myself to access the crowdfunding field what may i need.
 if you are intersted in this project, first two folders which are **downloadurl** and **kickstarterforcollectingdata** should be focus on.
 
 ### **downloadurl**
-- this folder is for search all possible project urls. it can be split into 2 parts.
+- this folder is for search all possible project urls. it have been split into 2 parts.
   - 1st part:
      - generating all category-based urls for hunman-read urls from [kickstarter corwdfunding platform!](www.kickstarter.com)
   - 2nd part:

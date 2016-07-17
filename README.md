@@ -17,7 +17,7 @@ and the aim is for help myself to access the crowdfunding field what may i need.
 if you are intersted in this project, first two folders which are **downloadurl** and **kickstarterforcollectingdata** should be focus on.
 
 ### **downloadurl**
-- this folder is for search all possible project urls. it can be split into 2 parts.
+- this folder is for search all possible project urls. it have been split into 2 parts.
   - 1st part:
      - generating all category-based urls for hunman-read urls from [kickstarter corwdfunding platform!](www.kickstarter.com)
   - 2nd part:
@@ -27,34 +27,36 @@ after that, you can access all estblished or live projects (included canceled, f
 ### **kickstarterforcollectingdata**
 - this folder include main spider program
 - my version format is **name**+**version**.py
-- in the **kickstarterforcollectingdata** folder, you can find a **reconstruction** folder. 
+- in the **kickstarterforcollectingdata** folder, you can find a folder named **reconstruction** . 
 - any things you want all saving in this folder
 - and what you may interst is the plan2.3.3.py or the version bigger than 2.3.3
 	- sometime i may add more information follwoing veriong number for .py file,like add fortxt or forcsv.
 
 ## 2.files
-- you may found a lot of txt files and csv or xlsx files, that may somedata what data i have collected until 4 July 2016. 
-- i will clean up those useless files when i finish my dissertation finally
+- you may find a lot of txt files and csv or xlsx files, that are some data what i have collected until 4 July 2016. 
+-PS: i will clean up those useless files when i finish my dissertation finally
 
 ## 3. codes
-- i use python 2.7 code  
-- and when you run the code, you may find some number or path ask for, you should type full path into two parts.
-- one is public path for what dir/folder you want save the data. the dir/folder must include 4 csv files and one txt file.(those must be named as follow)
-
-
-```		
+- I use python 2.7 to code  
+- and when you run the code, you may find some number or path be required to type in, you should type full path into two parts.
+	- one is public path for what dir/folder you want save the data. the dir/folder must include 4 csv files and one txt file.
+	- another is the full name of target file(csv format) 
+	- (those must be named as follow)
+```
+targetfile.csv
 collected.txt
 project_data.csv
 rewards_backers_distribution.csv
 rewards_pledge_limit.csv
 rewards_pledged_amount.csv 				
 ```
-- and a csv file which must include the target urls as column
+	
+-**the target file**  must include the target urls
 
 
 ___________________________I'm a line____________________________
 
-Wirtten by sn0wfree at 15 July 2016
+Wirtten by sn0wfree at 15 July 2016 Cardiff, UK
 
 	
 	

@@ -19,12 +19,12 @@ and the aim is for help myself to access the crowdfunding field what may i need.
 if you are intersted in this project, first two folders which are **downloadurl** and **kickstarterforcollectingdata** should be focus on.
 
 ### **downloadurl**
-- this folder is for search all possible project urls. what it include may involve 2 parts of information.
+- this folder is for search all possible project urls. what it included may involve 2 parts of information.
   - 1st part:
      - generating all category-based urls for hunman-read urls from [kickstarter corwdfunding platform!](www.kickstarter.com)
   - 2nd part:
      - throught requesting each category-based url, the bot can crawl and download the links which appear at the category page (16 projects each page).
-after that, you can access all estblished or live projects (included canceled, failed,live,successful and suspended projects).
+after that, you can access almost estblished or live projects (included canceled, failed,live,successful and suspended projects).
 
 ### **kickstarterforcollectingdata**
 - this folder include main spider program
@@ -59,8 +59,13 @@ rewards_pledged_amount.csv
  
 
 ## 5.upgrade
-- for now, i still try to upgrade my code. 
+- for now, i still try to upgrade my code, untill i finish my disseration.
 - now i'm work on covering the projects which  cannnot be searched from category pages
+
+
+
+
+
 
 ___________________________I'm a line____________________________
 

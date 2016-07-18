@@ -8,6 +8,8 @@ and the aim is for help myself to access the crowdfunding field what may i need.
 1. Included materials
 2. Files
 3. Codes
+4. update
+5. upgrade
 
 ------------------------
 
@@ -17,7 +19,7 @@ and the aim is for help myself to access the crowdfunding field what may i need.
 if you are intersted in this project, first two folders which are **downloadurl** and **kickstarterforcollectingdata** should be focus on.
 
 ### **downloadurl**
-- this folder is for search all possible project urls. it have been split into 2 parts.
+- this folder is for search all possible project urls. what it include may involve 2 parts of information.
   - 1st part:
      - generating all category-based urls for hunman-read urls from [kickstarter corwdfunding platform!](www.kickstarter.com)
   - 2nd part:
@@ -30,7 +32,7 @@ after that, you can access all estblished or live projects (included canceled, f
 - in the **kickstarterforcollectingdata** folder, you can find a folder named **reconstruction** . 
 - any things you want all saving in this folder
 - and what you may interst is the plan2.3.3.py or the version bigger than 2.3.3
-	- sometime i may add more information follwoing veriong number for .py file,like add fortxt or forcsv.
+	- sometime i may add more information after version number in the .py file,like add fortxt or forcsv.
 
 ## 2.files
 - you may find a lot of txt files and csv or xlsx files, that are some data what i have collected until 4 July 2016. 
@@ -52,7 +54,13 @@ rewards_pledged_amount.csv
 ```
 	
 -**the target file**  must include the target urls
+## 4. update
+- i know there still some bug i have not fixed, but anyway it work, that is it. i do not promise to fix it,but i will try my best to fix it and update it.
+ 
 
+## 5.upgrade
+- for now, i still try to upgrade my code. 
+- now i'm work on covering the projects which  cannnot be searched from category pages
 
 ___________________________I'm a line____________________________
 

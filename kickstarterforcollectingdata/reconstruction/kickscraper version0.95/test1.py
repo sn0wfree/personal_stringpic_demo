@@ -35,7 +35,18 @@ item_headers = ['Project_ID','project_name','Goal','url',
               'creator_personal_url','creator_buildhistory_has_backed_projects_number','creator_built_projects_number',
               'creator_bio_info_url','creator_Facebook_url','currency','duration','location_ID','state_changed_at','created_at','launched_at','Deadline','description','category','project_state','has_a_video','comments_count','updates_number','data_percent_rasied','hours_left','creator_short_name','creator_friends_facebook_number']
 
-
+def writeacsvprocess(file,headers,item):
+    with open(file,'r+') as project_data:
+        project_data_read_csv = unicodecsv.reader(project_data,headers)
+        if not headers in project_data_read_csv:
+            status=0
+        else:
+            status=1
+    with open(file,'a') as project_data:
+        project_data_csv = unicodecsv.DictWriter(project_data,headers)
+        if status ==0:
+            project_data_csv.writeheader()
+        project_data_csv.writerows(item)
 
 
 def readacsv(file):
@@ -43,8 +54,23 @@ def readacsv(file):
         w=pd.read_csv(file,skip_footer=1,engine='python')
     return w
 
+path='/Users/sn0wfree/Dropbox/BitTorrentSync/data/url/'
+dataset=readacsv(path+'dataset.csv')['url']
+alls=readacsv(path+'allurlsforkick.csv')['allurls']
+left=list(set(alls)-set(dataset))
+def collected_list_overwrite(item,file):
+    f = open (file,'w+')
+    lenitem=len(item)
+    for i in xrange(0,lenitem):
+        f.write(item[i]+'\n')
+    f.close()
 
-w=readacsv('/Users/sn0wfree/Dropbox/BitTorrentSync/recollectwrong/Book2.csv')
-a=w['url']
 
-print a[2]
+
+
+
+
+
+print len(left),left[1]
+
+collected_list_overwrite(left,'allleftofdataset.txt')

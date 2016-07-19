@@ -1268,7 +1268,7 @@ def sendmailtodelivery(mail_username,mail_password,to_addrs,*attachmentFilePaths
     smtp.sendmail(from_addr,to_addrs,msg.as_string())
     smtp.quit()
 
-def datacollectprocess(someurl):
+def datacollectprocess(someurl,file1):
     global total_item
     global total_rewards_backers_distribution
     global total_rewards_pledge_limit
@@ -1313,8 +1313,8 @@ def datacollectprocess(someurl):
         time.sleep(1)
             #time.sleep(1)
     f2 = time.time()
-    w=(len(file)-counts)*(f2-f1)/y
-    progress_test(counts,len(file),f2-f1,w)
+    w=(len(file1)-counts)*(f2-f1)/y
+    progress_test(counts,len(file1),f2-f1,w)
             #conditional_insert(cursor, item)
     #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects and remaining time: %.4f mins" % (counts,f2-f1,w))
     #sys.stdout.write("\rthis spider has already read %d projects" % (counts))
@@ -1339,7 +1339,7 @@ class ThreadClass(threading.Thread):
         while 1:
             (target) = self.queue.get()
             global collected
-            datacollectprocess(target)
+            datacollectprocess(target,file1)
             #time.sleep(1/10)
             self.queue.task_done()
 
@@ -1348,7 +1348,7 @@ def progress_test(counts,lenfile,speed,w):
     eta=time.time()+w
     precent =counts/float(lenfile)
 
-    ETA=datetime.datetime.fromtimestamp(eta).datatime()
+    ETA=datetime.datetime.fromtimestamp(eta)
     hashes = '#' * int(precent * bar_length)
     spaces = ' ' * (bar_length - len(hashes))
     sys.stdout.write("""\r%d%%|%s|read %d projects|ETA: %s """ % (precent*100,hashes + spaces,counts,ETA))
@@ -1396,10 +1396,11 @@ if __name__ == '__main__':
                   'pledged_amount','backers_count','creator_full_name',
                   'creator_personal_url','creator_has_backed_projects_number','creator_has_built_projects_number',
                   'creator_bio_info_url','creator_Facebook_url','currency','duration','location_ID','state_changed_at','created_at','launched_at','Deadline','description','category','project_state','has_a_video','comments_count','updates_number','data_percent_rasied','hours_left','creator_short_name','creator_friends_facebook_number']
-    (file,collected) = createurlfromcsv(target_url_file,have_collected_url)
+    global file1
+    (file1,collected) = createurlfromcsv(target_url_file,have_collected_url)
     print 'begin to collecting data'
-    global file
-    main(file,y)
+
+    main(file1,y)
     collected_list_overwrite(collected,have_collected_url)
     #(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=catchup(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
     writeacsvprocess(saving_file,item_headers,total_item)

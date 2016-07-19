@@ -619,14 +619,14 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
         if hasattr(e, 'reason'):
             print 'We failed to reach a server.'
             print 'Reason: ', e.reason
-            item={'Project_ID':0,'project_state':'Error'}
+            projectitem={'Project_ID':0,'project_state':'Error'}
             rewards={}
             ID=0
             state='Error'
         elif hasattr(e, 'code'):
             print 'The server couldn\'t fulfill the request.'
             print 'Error code: ', e.code
-            item={'Project_ID':0,'project_state':'Error'}
+            projectitem={'Project_ID':0,'project_state':'Error'}
             rewards={}
             ID=0
             state='Error'
@@ -893,14 +893,14 @@ def webscraper_live(someurl,sel,the_page1):
         if hasattr(e, 'reason'):
             print 'We failed to reach a server.'
             print 'Reason: ', e.reason
-            item={'Project_ID':0,'project_state':'Error'}
+            projectitem={'Project_ID':0,'project_state':'Error'}
             rewards={}
             ID=0
             state='Error'
         elif hasattr(e, 'code'):
             print 'The server couldn\'t fulfill the request.'
             print 'Error code: ', e.code
-            item={'Project_ID':0,'project_state':'Error'}
+            projectitem={'Project_ID':0,'project_state':'Error'}
             rewards={}
             ID=0
             state='Error'

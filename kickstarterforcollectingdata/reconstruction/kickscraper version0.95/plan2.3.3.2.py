@@ -38,11 +38,13 @@ from email.Encoders import encode_base64
 from email.utils import COMMASPACE
 import pandas as pd
 
+#compress process suite
 def zipafilefordelivery(file,target):
     with zipfile.ZipFile(file, 'w',zipfile.ZIP_DEFLATED) as z:
         z.write(target)
         z.close
-
+#------------------------------------------------------------------------------
+# read or write process suite
 def readacsv(file):
     with open(file,'r+') as f:
         w=pd.read_csv(file,skip_footer=1,engine='python')
@@ -73,7 +75,7 @@ def projetcdata_txt_wholewrite(item,file):
 
 
 
-    #print 'saving ptoject data process completed'
+
 def collected_list_overwrite(item,file):
     f = open (file,'w')
     lenitem=len(item)
@@ -81,6 +83,83 @@ def collected_list_overwrite(item,file):
         f.write(item[i]+'\n')
     f.close()
 
+def writeacsvprocess(file,headers,item):
+    with open(file,'r+') as project_data:
+        project_data_read_csv = unicodecsv.reader(project_data,headers)
+        if not headers in project_data_read_csv:
+            status=0
+        else:
+            status=1
+    with open(file,'a') as project_data:
+        project_data_csv = unicodecsv.DictWriter(project_data,headers)
+        if status ==0:
+            project_data_csv.writeheader()
+        project_data_csv.writerows(item)
+
+def savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount):
+    if item !={}:
+        total_item.append(item)
+
+        (rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict)=rewardsseperategenerateprocess(rewards)
+        total_rewards_backers_distribution.append(rewards_backers_distribution_dict)
+        total_rewards_pledge_limit.append(rewards_pledge_limit_dict)
+        total_rewards_pledged_amount.append(rewards_pledged_amount_dict)
+
+
+    return total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount
+    #print list(rewards)
+#--------------------------------------------------------------------
+#optimal process
+def datacollectprocess(someurl,file1):
+    global total_item
+    global total_rewards_backers_distribution
+    global total_rewards_pledge_limit
+    global total_rewards_pledged_amount
+    global collected
+    global counts
+    global rewards_headers
+    global item_headers
+    global rewards_backers_distribution
+    global rewards_pledge_limit
+    global rewards_pledged_amount
+    global saving_file
+    f1 = time.time()
+    if someurl !=''and someurl!='\n':
+        (id,state,sel,the_page1) = compareindexprocess(someurl)
+        item={}
+        rewards={}
+        (item,rewards,ID,state)= datagenerateprocess(someurl,state,sel,the_page1)
+        (total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
+        counts = counts + 1
+        if item!={}:
+            collected.append(someurl)
+        time.sleep(1+len(total_item)/50)
+    if len(total_item)>50:
+            #print rewards_backers_distribution
+            #print rewards_pledge_limit,rewards_pledged_amount
+            #print
+        collected_list_overwrite(collected,have_collected_url)
+            #projetcdata_txt_wholewrite(item,item_collect)
+            #projetcdata_txt_wholewrite(rewards,rewards_collect)
+        writeacsvprocess(saving_file,item_headers,total_item)
+        writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
+        writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)
+        writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
+            #reset list
+        total_item=[]
+        total_rewards_backers_distribution=[]
+        total_rewards_pledge_limit=[]
+        total_rewards_pledged_amount=[]
+        gc.collect()
+        time.sleep(1)
+            #time.sleep(1)
+    f2 = time.time()
+    w=(len(file1)-counts)*(f2-f1)/y
+    progress_test(counts,len(file1),f2-f1,w)
+            #conditional_insert(cursor, item)
+    #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects and remaining time: %.4f mins" % (counts,f2-f1,w))
+    #sys.stdout.write("\rthis spider has already read %d projects" % (counts))
+    #sys.stdout.flush()
 
 def rewardsseperategenerateprocess(rewards):
     rewards_backers_distribution_dict={}
@@ -117,6 +196,7 @@ def rewardsseperategenerateprocess(rewards):
 
 
     return rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict
+
 def datagenerateprocess(url,state,sel,the_page1):
     someurl=''.join(url.split())
     if state != 'Error':
@@ -134,6 +214,7 @@ def datagenerateprocess(url,state,sel,the_page1):
         ID=0
         state='Error'
     return item,rewards,ID,state
+
 def compareindexprocess(url):
     if url!=[] and type(url)!=float:
         someurl =''.join(url.split())
@@ -186,37 +267,40 @@ def compareindexprocess(url):
 
     return ID,state,sel,the_page1
 
-
-def savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount):
-    if item !={}:
-        total_item.append(item)
-
-        (rewards_backers_distribution_dict,rewards_pledge_limit_dict,rewards_pledged_amount_dict)=rewardsseperategenerateprocess(rewards)
-        total_rewards_backers_distribution.append(rewards_backers_distribution_dict)
-        total_rewards_pledge_limit.append(rewards_pledge_limit_dict)
-        total_rewards_pledged_amount.append(rewards_pledged_amount_dict)
-
-
-    return total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount
-    #print list(rewards)
-def writeacsvprocess(file,headers,item):
-    with open(file,'r+') as project_data:
-        project_data_read_csv = unicodecsv.reader(project_data,headers)
-        if not headers in project_data_read_csv:
-            status=0
+def creator_another_related_project_seek_process(creator_has_built_projects_number,creator_bio_info_url,creator_bio_info_url_sel):
+    root_url = 'https://www.kickstarter.com'
+    if 'First' in creator_has_built_projects_number:
+        creator_another_related_project_urls=[]
+    else:
+        creator_created_project_list_lastpart=creator_bio_info_url_sel.xpath('//*[@id="bio"]/div/div[2]/div[4]/a[1]/@href')
+        creator_created_project_list=root_url+creator_created_project_list_lastpart
+        try:
+            someurls=creator_created_project_list
+            response = Request(someurls)
+            content = urllib2.urlopen(someurls).read()
+            sel= etree.HTML(content)
+              ##this is for some data without tab.
+            req = urlopen(response)
+            the_page1 = req.readlines()
+        except:
+            'meet error'
+            pass
+            creator_another_related_project_urls=[]
         else:
-            status=1
-    with open(file,'a') as project_data:
-        project_data_csv = unicodecsv.DictWriter(project_data,headers)
-        if status ==0:
-            project_data_csv.writeheader()
-        project_data_csv.writerows(item)
+            possible_urls = sel.xpath('//*[@id="main"]/div/ol/li[*]/div/div[*]//@href')
+            possible_urls=list(set(possible_urls))
+            creator_another_related_project_urls=[]
+            for url in possible_urls:
+                if '?ref=users' in url:
+                    creator_another_related_project_urls.append(url)
+    return creator_another_related_project_urls
 
-def listleftn(l):
-    lenlists =len(l)
-    for i in xrange(0,lenlists):
-        l[i]=l[i].strip('\n')
-    return l
+
+
+                                #sel.xpath('//*[@id="bio"]/div/div[2]/div[4]/text()[1]')'
+#/profile/mogeesplay/created
+#---------------------------------------------------------------------
+#main collection process
 def webscraper_successed(someurl,a,the_page):
     root_url = 'https://www.kickstarter.com'
     try:
@@ -1067,6 +1151,15 @@ def webscraper_live(someurl,sel,the_page1):
         rewards[ 'pledge_limit' ]= listleftn(pledge_limit)
         projectitem['category']= category
     return projectitem, rewards , projectitem[ 'Project_ID'] , projectitem['project_state']
+#----------------------------------------------------------------
+
+def listleftn(l):
+    lenlists =len(l)
+    for i in xrange(0,lenlists):
+        l[i]=l[i].strip('\n')
+    return l
+#pre-processs
+#loading collected information
 def createurl(target_url_file,have_collected_url):
     url_list =read_url_file(target_url_file)
     collected_unclear=read_url_file(have_collected_url)
@@ -1074,6 +1167,7 @@ def createurl(target_url_file,have_collected_url):
     file_lsit=list(set(url_list)-set(collected))
     file = list(set(file_lsit))
     return file,collected
+
 def createurlfromcsv(target_url_file_csv,have_collected_url):
     target_url_file=readacsv(target_url_file_csv)
     url_list =target_url_file['url']
@@ -1082,6 +1176,7 @@ def createurlfromcsv(target_url_file_csv,have_collected_url):
     file_lsit=list(set(url_list)-set(collected))
     file = list(set(file_lsit))
     return file,collected
+#loading sving path process
 def filepathcollection(publicpath,url_file):
     #/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/total/collected.txt
     #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterrunopt/reconstruction/data/middle60project/total'
@@ -1096,7 +1191,8 @@ def filepathcollection(publicpath,url_file):
     target_url_file= publicpath+ url_file
     have_collected_url= publicpath+'/collected.txt'
     return rewards_backers_distribution,rewards_pledge_limit,rewards_pledged_amount,saving_file,target_url_file,have_collected_url
-
+#-------------------------------------------------------------
+#mail_it_prcess
 def getAttachment(attachmentFilePath):
     contentType, encoding = mimetypes.guess_type(attachmentFilePath)
 
@@ -1121,6 +1217,7 @@ def getAttachment(attachmentFilePath):
 
     attachment.add_header('Content-Disposition', 'attachment',filename=os.path.basename(attachmentFilePath))
     return attachment
+
 def sendmailtodelivery(mail_username,mail_password,to_addrs,*attachmentFilePaths):
     from_addr = mail_username
     # HOST & PORT
@@ -1157,59 +1254,8 @@ def sendmailtodelivery(mail_username,mail_password,to_addrs,*attachmentFilePaths
     #print msg.as_string()
     smtp.sendmail(from_addr,to_addrs,msg.as_string())
     smtp.quit()
-
-def datacollectprocess(someurl,file1):
-    global total_item
-    global total_rewards_backers_distribution
-    global total_rewards_pledge_limit
-    global total_rewards_pledged_amount
-    global collected
-    global counts
-    global rewards_headers
-    global item_headers
-    global rewards_backers_distribution
-    global rewards_pledge_limit
-    global rewards_pledged_amount
-    global saving_file
-    f1 = time.time()
-    if someurl !=''and someurl!='\n':
-        (id,state,sel,the_page1) = compareindexprocess(someurl)
-        item={}
-        rewards={}
-        (item,rewards,ID,state)= datagenerateprocess(someurl,state,sel,the_page1)
-        (total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=savingcsvforalltaskprocess(rewards,item,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
-        counts = counts + 1
-        if item!={}:
-            collected.append(someurl)
-        time.sleep(1+len(total_item)/50)
-    if len(total_item)>50:
-            #print rewards_backers_distribution
-            #print rewards_pledge_limit,rewards_pledged_amount
-            #print
-        collected_list_overwrite(collected,have_collected_url)
-            #projetcdata_txt_wholewrite(item,item_collect)
-            #projetcdata_txt_wholewrite(rewards,rewards_collect)
-        writeacsvprocess(saving_file,item_headers,total_item)
-        writeacsvprocess(rewards_backers_distribution,rewards_headers,total_rewards_backers_distribution)
-        writeacsvprocess(rewards_pledge_limit,rewards_headers,total_rewards_pledge_limit)
-        writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
-            #reset list
-        total_item=[]
-        total_rewards_backers_distribution=[]
-        total_rewards_pledge_limit=[]
-        total_rewards_pledged_amount=[]
-        gc.collect()
-        time.sleep(1)
-            #time.sleep(1)
-    f2 = time.time()
-    w=(len(file1)-counts)*(f2-f1)/y
-    progress_test(counts,len(file1),f2-f1,w)
-            #conditional_insert(cursor, item)
-    #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects and remaining time: %.4f mins" % (counts,f2-f1,w))
-    #sys.stdout.write("\rthis spider has already read %d projects" % (counts))
-    #sys.stdout.flush()
-
-
+#-------------------------------------------------------------------------
+#multiprocessing
 def main(file,y):
 
     for j in xrange(y):
@@ -1220,6 +1266,7 @@ def main(file,y):
 
         queue.put(someurl)
     queue.join()
+
 class ThreadClass(threading.Thread):
     def __init__(self, queue):
         threading.Thread.__init__(self)
@@ -1231,13 +1278,13 @@ class ThreadClass(threading.Thread):
             datacollectprocess(target,file1)
             #time.sleep(1/10)
             self.queue.task_done()
-
+#progress_bar
 def progress_test(counts,lenfile,speed,w):
     bar_length=30
     eta=time.time()+w
     precent =counts/float(lenfile)
 
-    ETA=datetime.datetime.fromtimestamp(eta).datatime()
+    ETA=datetime.datetime.fromtimestamp(eta)
     hashes = '#' * int(precent * bar_length)
     spaces = ' ' * (bar_length - len(hashes))
     sys.stdout.write("""\r%d%%|%s|read %d projects|ETA: %s """ % (precent*100,hashes + spaces,counts,ETA))
@@ -1257,8 +1304,9 @@ if __name__ == '__main__':
     print '***********************************************************'
     publicpath=input('2) please enter the document path for saving file:')
     print '=============================================================='
-    #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/kickstarterscrapy/kickstarterforcollectingdata/reconstruction/test'
+    #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/data/sample folder'
     url_file=input ('3) please enter the target url file for starting,need add /:')
+    #url_file='/allleftofdataset.csv'
     gc.enable()
 
     global counts

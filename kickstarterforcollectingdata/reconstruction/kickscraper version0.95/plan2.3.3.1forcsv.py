@@ -1348,7 +1348,7 @@ def progress_test(counts,lenfile,speed,w):
     eta=time.time()+w
     precent =counts/float(lenfile)
 
-    ETA=datetime.datetime.fromtimestamp(eta).datatime()
+    ETA=datetime.datetime.fromtimestamp(eta)
     hashes = '#' * int(precent * bar_length)
     spaces = ' ' * (bar_length - len(hashes))
     sys.stdout.write("""\r%d%%|%s|read %d projects|ETA: %s """ % (precent*100,hashes + spaces,counts,ETA))

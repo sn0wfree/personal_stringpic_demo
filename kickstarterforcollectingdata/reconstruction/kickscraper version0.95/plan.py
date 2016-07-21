@@ -47,43 +47,70 @@ from email.header import Header
 from email.Encoders import encode_base64
 from email.utils import COMMASPACE
 import pandas as pd
+import celery
+
+
+
 
 #someurl='https://www.kickstarter.com/projects/399230478/the-horror-of-loon-lake-revealed?ref=category_newest'
+def conn_try_again(function):
+    RETRIES = 0
+    #重试的次数
+    count = {"num": RETRIES}
+    def wrapped(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except Exception, err:
+            if count['num'] < 5:
+                time.sleep(1)
+                count['num'] += 1
+                return wrapped(*args, **kwargs)
+            else:
+                raise Exception(err)
+    return wrapped
 
-def pre_update_request_url_process(someurls):
+
+
+@celery.task(bind=True,max_retries=5,default_retry_delay=0.1 * 6)
+def pre_update_request_url_process(self,someurls):
+    global errorcounts
+    errorcounts=1
     try:
-            #print someurls
-        response = Request(someurls)
         content = urllib2.urlopen(someurls).read()
         sel= etree.HTML(content)
           ##this is for some data without tab.
-        req = urlopen(response)
-        the_page1 = req.readlines()
     except URLError as e:
         if hasattr(e, 'reason'):
-            print 'We failed to reach a server.'
-            print 'Reason: ', e.reason
-            item={'Project_ID':0,'project_state':'Error'}
-            rewards={}
-            ID=0
-            state='Error'
-            sel=''
-            the_page1=''
+            pass
+            #print 'We failed to reach a server.'
+            #print 'Reason: ', e.reason
         elif hasattr(e, 'code'):
-            print 'The server couldn\'t fulfill the request.'
-            print 'Error code: ', e.code
-            item={'Project_ID':0,'project_state':'Error'}
-            rewards={}
-            ID=0
-            state='Error'
-            sel=''
-            the_page1=''
+            pass
+            #print 'The server couldn\'t fulfill the request.'
+            #print 'Error code: ', e.code
+        #state='Error'
+        #sel=''
+        #the_page1=''
+        errorcounts+=1
+        #raise self.retry(exc=e , countdown=1)
+    except:
+        state='Error'
+        sel=''
+        the_page1=''
+        errorcounts+=1
     else:
-
+        the_page1=''
         state='good'
+        errorcounts=0
+    finally:
+        if errorcounts==0 or errorcounts >5:
+            return state,sel,the_page1
 
 
-    return state,sel,the_page1
+
+
+
+
 
 
 def updateinfo(url,Project_ID,state):

@@ -1,33 +1,6 @@
 from plan import *
 import gc,time,datetime
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+import celery
 
 def updateinfo(url,Project_ID,state):
     update_community_dict={}
@@ -93,7 +66,6 @@ def updateinfo(url,Project_ID,state):
 
         update_community_dict['update_datetime']='Error'
     update_community_dict['Project_ID']=Project_ID
-
     if '?ref=' in url:
         url_community_split=url.split('?ref=')[0]
         url_community=url_community_split+'/community'
@@ -101,9 +73,14 @@ def updateinfo(url,Project_ID,state):
         url_community=''
     (state_community_status,sel_community,the_page1_community)=pre_update_request_url_process(url_community)
     if state_community_status !='Error':
-        community_returning_backers=sel_community.xpath('//*[@class="community-block-content clearfix"]/div[@class="existing-backers"]/div[@class="count"]/text()')[0].split()[0]
-        community_new_backers=sel_community.xpath('//*[@class="community-block-content clearfix"]/div[@class="new-backers"]/div[@class="count"]/text()')[0].split()[0]
-
+        community_returning_backers=sel_community.xpath('//*[@class="community-block-content clearfix"]/div[@class="existing-backers"]/div[@class="count"]/text()')
+        community_new_backers=sel_community.xpath('//*[@class="community-block-content clearfix"]/div[@class="new-backers"]/div[@class="count"]/text()')
+        if community_returning_backers !=[]:
+            community_returning_backers=community_returning_backers[0].split()[0]
+            community_new_backers=community_new_backers[0].split()[0]
+        else:
+            community_returning_backers=[]
+            community_new_backers=[]
     else:
         community_returning_backers='Error'
         community_new_backers='Error'
@@ -111,7 +88,6 @@ def updateinfo(url,Project_ID,state):
     update_community_dict['community_new_backers']=community_new_backers
 
     return update_community_dict
-
 
 def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,length):
     global total_project_info
@@ -135,11 +111,11 @@ def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,le
         date['community_new_backers']=project_info_single['community_new_backers']
         date['community_returning_backers']=project_info_single['community_returning_backers']
         total_project_info.append(date)
-        counts+=1
         collected.append(url)
+        counts+=1
         date={}
-    
-    time.sleep(0.1+len(total_project_info)/50)
+
+    time.sleep(0.5+1/(len(total_project_info)+1))
 
     if len(total_project_info)>50:
         #saving process
@@ -148,7 +124,9 @@ def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,le
         total_project_info=[]
         gc.collect()
 
+
     f2=time.time()
+
 
     w=(length-counts)*(f2-f1)/y
     progress_test(counts,length,f2-f1,w)
@@ -194,13 +172,13 @@ def inputenver(status=0):
         filepath=input('please enter name of dataset file:')
         saving_file_name=input('saving file name setting for:')
     else:
-        publicpp='/Users/sn0wfree/Dropbox/BitTorrentSync/data/update+community'
+        publicpp='/Users/sn0wfree/Dropbox/BitTorrentSync/data/update+community/uc1'
         filepath='uc1.csv'
-        saving_file_name='update_community.csv'
+        saving_file_name='ucdata1.csv'
     return publicpp,filepath,saving_file_name
 
 if __name__ == "__main__":
-    gc.enable()
+
     status=input('setup a status(0-99):')
     y=input('to choose the number of workers for this tasks:')
 
@@ -212,7 +190,7 @@ if __name__ == "__main__":
 
 
     file1=publicpp+'/'+filepath
-    projectdataset=readacsv(file1)
+
 
 
 
@@ -229,30 +207,29 @@ if __name__ == "__main__":
 
     global collected
     collected=read_url_file(collected_file)
+    projectdataset=readacsv(file1)
 
 
 
-    urls=projectdataset['url']
+    urls=projectdataset['url'].values.tolist()
     #Project_IDs=projectdataset['Project_ID']
     #project_states=projectdataset['project_state']
     #Deadlines=projectdataset['Deadline']
     #launched_ats=projectdataset['launched_at']
     length=len(urls)
-    global total_project_info
-    global counts
-    counts=0
-    total_project_info=[]
-    #print projectdataset['url'][1]
 
+    tempp=[]
     for i in xrange(0,length):
         if urls[i] in collected:
-            projectdataset=projectdataset.drop(i,axis=0)
+            tempp.append(i)
+    for j in tempp:
+        projectdataset=projectdataset.drop(j,axis=0)
+
+
             #Project_IDs.drop('%s'%i)
             #project_states.drop('%s'%i)
             #Deadlines.drop('%s'%i)
             #launched_ats.drop('%s'%i)
-        else:
-            pass
     tasks=[]
     #print projectdataset
     #print projectdataset['url'][10000]
@@ -261,6 +238,11 @@ if __name__ == "__main__":
     project_states=projectdataset['project_state'].values.tolist()
     Deadlines=projectdataset['Deadline'].values.tolist()
     launched_ats=projectdataset['launched_at'].values.tolist()
+    global total_project_info
+    global counts
+    counts=0
+    total_project_info=[]
+    #print projectdataset['url'][1]
     for j in xrange(0,len(urls)):
         temp={}
         temp['url']=urls[j]
@@ -270,9 +252,7 @@ if __name__ == "__main__":
         temp['launched_at']=launched_ats[j]
         tasks.append(temp)
     #print tasks
-
-
-
+    gc.enable()
     queue = Queue.Queue()
     mainupdate(tasks,y)
     writeacsvprocess(saving_file,update_headers,total_project_info)

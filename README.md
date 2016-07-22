@@ -19,23 +19,14 @@ and the aim is for help myself to access the crowdfunding field what may i need.
 ## 1. included materials
 >In those code files, those may include some useless materials for other people who want to read.Here,i just show the important materials if you want to use mine code.These have three folders which may include a lots of .py files
 
-if you are intersted in this project, first two folders which are **downloadurl** and **kickstarterforcollectingdata** should be focus on.
-
-### **downloadurl**
-- this folder is for search all possible project urls. what it included may involve 2 parts of information.
-  - 1st part:
-     - generating all category-based urls for hunman-read urls from [kickstarter corwdfunding platform!](www.kickstarter.com)
-  - 2nd part:
-     - throught requesting each category-based url, the bot can crawl and download the links which appear at the category page (16 projects each page).
-after that, you can access almost estblished or live projects (included canceled, failed,live,successful and suspended projects).
+if you are intersted in this project, first folder which is **kickstarterforcollectingdata** should be focus on.
 
 ### **kickstarterforcollectingdata**
 - this folder include main spider program
-- my version format is **name**+**version**.py
 - in the **kickstarterforcollectingdata** folder, you can find a folder named **reconstruction** . 
-- any things you want all saving in this folder
-- and what you may interst is the plan2.3.3.py or the version bigger than 2.3.3
-	- sometime i may add more information after version number in the .py file,like add fortxt or forcsv.
+	- any things you want all saving in this folder
+- there is only one file you may be interested in: plan.py
+	
 
 ## 2.files
 - you may find a lot of txt files and csv or xlsx files, that are some data what i have collected until 4 July 2016. 

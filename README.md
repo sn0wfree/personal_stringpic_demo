@@ -1,17 +1,20 @@
+
+
 # Kickstarterscrapy
-=====================
+-------------------------------------------------
+```
 This python file is just for collecting kickstarter crowdfunding platform data!!
 and the aim is for help myself to access the crowdfunding field what may i need.
+```
 # Menu
-
----------------
+------------------------------------------------
 1. Included materials
 2. Files
 3. Codes
 4. update
 5. upgrade
 
-------------------------
+-----------------------------------------------
 
 ## 1. included materials
 >In those code files, those may include some useless materials for other people who want to read.Here,i just show the important materials if you want to use mine code.These have three folders which may include a lots of .py files

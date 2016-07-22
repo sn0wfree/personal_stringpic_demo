@@ -54,23 +54,17 @@ def readacsv(file):
         w=pd.read_csv(file,skip_footer=1,engine='python')
     return w
 
-path='/Users/sn0wfree/Dropbox/BitTorrentSync/data/url/'
-dataset=readacsv(path+'dataset.csv')['url']
-alls=readacsv(path+'allurlsforkick.csv')['allurls']
-left=list(set(alls)-set(dataset))
+path='/Users/sn0wfree/Dropbox/BitTorrentSync/data/'
+allleftre=readacsv(path+'allleftre.csv')['url']
+#alls=readacsv(path+'allurlsforkick.csv')['allurls']
+#left=list(set(alls)-set(dataset))
+
+print len(allleftre)
+
+
 def collected_list_overwrite(item,file):
     f = open (file,'w+')
     lenitem=len(item)
     for i in xrange(0,lenitem):
         f.write(item[i]+'\n')
     f.close()
-
-
-
-
-
-
-
-print len(left),left[1]
-
-collected_list_overwrite(left,'allleftofdataset.txt')

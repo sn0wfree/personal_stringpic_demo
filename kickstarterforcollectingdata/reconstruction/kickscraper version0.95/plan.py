@@ -4,9 +4,19 @@
 #-----------------------------------------------------------------------------------------------
 '''
 this code is for my dissertation.
+
 '''
+#version control
+
+
+__author__='sn0wfree'
+__version__='2.3.3.2'
+
+
+
 #-----------------------------------------------------------------------------------------------
 ###
+
 import multiprocessing as mp
 import sys
 import zipfile
@@ -37,6 +47,182 @@ from email.header import Header
 from email.Encoders import encode_base64
 from email.utils import COMMASPACE
 import pandas as pd
+import celery
+
+
+
+
+#someurl='https://www.kickstarter.com/projects/399230478/the-horror-of-loon-lake-revealed?ref=category_newest'
+def conn_try_again(function):
+    RETRIES = 0
+    #重试的次数
+    count = {"num": RETRIES}
+    def wrapped(*args, **kwargs):
+        try:
+            return function(*args, **kwargs)
+        except Exception, err:
+            if count['num'] < 5:
+                time.sleep(1)
+                count['num'] += 1
+                return wrapped(*args, **kwargs)
+            else:
+                raise Exception(err)
+    return wrapped
+
+
+
+@celery.task(bind=True,max_retries=5,default_retry_delay=0.1 * 6)
+def pre_update_request_url_process(self,someurls):
+
+    try:
+        content = urllib2.urlopen(someurls).read()
+        sel= etree.HTML(content)
+        status='Good'
+        return status,sel
+        ##this is for some data without tab.
+    except URLError as e:
+        if hasattr(e, 'reason'):
+            pass
+            #print 'We failed to reach a server.'
+            #print 'Reason: ', e.reason
+        elif hasattr(e, 'code'):
+            pass
+            #print 'The server couldn\'t fulfill the request.'
+            #print 'Error code: ', e.code
+        status='Error'
+        sel='Error'
+        raise self.retry(exc=e,countdown=1)
+
+
+
+
+
+        #raise self.retry(exc=e , countdown=1)
+
+
+
+
+
+
+
+
+
+
+
+def updateinfo(url,Project_ID,state):
+    update_dict={}
+    if state=='successful':
+        url_update=url
+    else:
+        if '?ref=' in url:
+            url_split=url.split('?ref=')[0]
+        else:
+            url_split=''
+        if url_split !='':
+            url_update=url_split+'/updates'
+        else:
+            url_update=''
+
+    (state,sel,the_page1)=pre_update_request_url_process(url_update,state)
+    if state !='Error':
+        #if state=='live'
+                                #   //*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[2]
+                                #   //*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/div/div[1]/time//@datetime
+                                    #//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div
+                                    #//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[2]/div/div[1]/time
+                                                                                      #//*[@class="timeline"]/div[*]//@datetime
+        update_datetime =sel.xpath('//*[@class="timeline"]/div[*]//@datetime')
+        update_description=sel.xpath('//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/a/div[1]/p')
+        update_interactive1=sel.xpath('//*[@class="timeline"]//*[@class="grid-post__metadata"]/span[1]/text()')
+        update_interactive2=sel.xpath('//*[@class="timeline"]//*[@class="grid-post__metadata"]/span[2]/text()')
+
+        #update_comments=sel.xpath('//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/a/div[2]/span[1]//text()')
+        #update_like=sel.xpath('//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/a/div[2]/span[2]//text()')
+        print len(update_interactive1),update_interactive1[0]
+        #print update_interactive1 comment
+        Comment_index=''
+        for el1 in update_interactive1:
+            if el1 !='\n':
+                if 'Comment' in el1 :
+                    Comment_index='Comment in update_interactive1'
+                    update_comments=update_interactive1
+                    update_like=update_interactive2
+                    break
+
+        for el2 in update_interactive2:
+            if el2 !='\n':
+                if 'Comment' in el2 :
+                    Comment_index='Comment in update_interactive2'
+                    update_comments=update_interactive2
+                    update_like=update_interactive1
+                    break
+
+        if Comment_index =='':
+            for el1 in update_interactive1:
+                if el1 !='\n':
+                    if 'like' in el1 :
+                        like_index='like in update_interactive1'
+                        update_like=update_interactive1
+                        update_comments=update_interactive2
+                        break
+            for el2 in update_interactive2:
+                if el2 !='\n':
+                    if 'like' in el2 :
+                        like_index='like in update_interactive2'
+                        update_like=update_interactive2
+                        update_comments=update_interactive1
+                        break
+        else:
+            update_like=update_interactive2
+            update_comments=update_interactive1
+
+
+
+
+
+        #if  'Comment' in [el2 for el2 in  update_interactive2]:
+        #    update_like=update_interactive1
+        #    update_comments=update_interactive2
+        #    print 'Comment in update_interactive2'
+        #elif 'like' in [el2 for el2 in  update_interactive2]:
+        #    update_like=update_interactive2
+        #    update_comments=update_interactive1
+        #    print 'like in update_interactive2'
+        #elif 'like' in [el1 for el1 in  update_interactive1]:
+        #    update_like=update_interactive1
+        #    update_comments=update_interactive2
+        #    print 'like in update_interactive1'
+        #elif 'Comment' in [el1 for el1 in update_interactive1]:
+        #    update_like=update_interactive2
+        #    update_comments=update_interactive1
+        #
+        #    print 'comment in update_interactive1'
+        #
+        #else:
+        #    print 'cannot find'
+        #    update_like=update_interactive1
+        #    update_comments=update_interactive2
+
+        update_dict['update_datetime']=update_datetime
+        update_dict['update_description']=update_description
+        update_dict['update_comments']=update_comments
+        update_dict['update_like']=update_like
+        #update_dict['update_interactive1']=update_interactive1
+        #update_dict['update_interactive2']=update_interactive2
+        update_dict['Project_ID']=Project_ID
+    return update_dict
+
+
+
+
+
+
+
+
+
+
+
+
 
 #compress process suite
 def zipafilefordelivery(file,target):
@@ -57,12 +243,10 @@ def read_url_file(file):
         for x in file_unclear_list:
 
             a=x.split()
-            if a==[]:
-                file_unclear.append(a)
-            else:
+            if a!=[]:
                 file_unclear.append(a[0])
-
-
+            else:
+                pass
             #print x
             #file_unclear.appen(x)
         return file_unclear
@@ -116,6 +300,7 @@ def datacollectprocess(someurl,file1):
     global total_rewards_pledge_limit
     global total_rewards_pledged_amount
     global collected
+
     global counts
     global rewards_headers
     global item_headers
@@ -133,7 +318,7 @@ def datacollectprocess(someurl,file1):
         counts = counts + 1
         if item!={}:
             collected.append(someurl)
-        time.sleep(1+len(total_item)/50)
+        time.sleep(1+len(total_item)*y/500)
     if len(total_item)>50:
             #print rewards_backers_distribution
             #print rewards_pledge_limit,rewards_pledged_amount
@@ -368,28 +553,36 @@ def webscraper_successed(someurl,a,the_page):
                         goal_seek =word.split('&quot;:')[1]
         #                            //*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/a[1]/text()
 
-        location_id_str = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/a[1]/text()')
+
+        category_location_str = sel.xpath('//*[@class="NS_projects__category_location ratio-16-9"]//*/text()')
+        try:
+            location_id_str=category_location_str[0]
+        except:
+            location_id_str='Error'
+
+
+        try:
+            category_str=category_location_str[1]
+        except:
+            category_str='Error'
+
+
 
         #print 'location is %s ' %location_id_str
         location_id =''.join(location_id_str).strip('\n')
+        category=''.join(category_str).strip('\n')
+
+
         launched_at=''.join(launched_at_str)
         project_ID = ''.join(project_ID_str)
         created_at=''.join(created_at_str)
-        category = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/a[2]/text()')
+        #category = sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[1]/div[1]/div[2]/div[1]/div/div/a[2]/text()')
         state_changed_at=''.join(state_changed_at_str)
         deadline_quot=''.join(deadline_quot_str)
         goal=''.join(goal_seek)
-        backers_count_a= sel.xpath('//*[@id="content-wrap"]/section/div[2]/div[2]/div/div/div[2]/div[4]/b/text()')
-        pledged_amount_a = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div[2]/div/div/div[2]/div[4]/span/text()')
-        if pledged_amount_a ==[]:
-            backers_count_c=sel.xpath('//*[@id="content-wrap"]/section/div[2]/div[2]/div/div/div[2]/div[5]/b/text()')
+        backers_count= sel.xpath('//*[@class="NS_projects__spotlight_stats"]/b/text()')[0]
+        pledged_amount = sel.xpath('//*[@class="NS_projects__spotlight_stats"]/span/text()')[0]
 
-            pledged_amount_c= sel.xpath('//*[@id="content-wrap"]/div[2]/section[1]/div/div/div/div/div[1]/div[1]/div[2]/div[2]/h3/span/text()')
-        else:
-            backers_count_c=backers_count_a
-            pledged_amount_c=pledged_amount_a
-        pledged_amount = pledged_amount_c
-        backers_count=backers_count_c
 
         data_percent_rasied = sel.xpath('//*[@id="pledged"]/@data-percent-raised')
         currency = sel.xpath('//*[@id="pledged"]/data/@data-currency')
@@ -524,9 +717,9 @@ def webscraper_successed(someurl,a,the_page):
             creator_friends__facebook_number = 'Not connected'
             for word in creator_friends__facebook_number_potential:
                 if 'created' in word:
-                    creator_buildhistory_has_built_projects_number=word
+                    creator_buildhistory_has_built_projects_number=word.split('\n')
                 if 'backed' in word:
-                    creator_buildhistory_has_backed_projects_number=word
+                    creator_buildhistory_has_backed_projects_number=word.split('\n')
                 if 'friend' in word:
                     creator_friends__facebook_number= word
                 #creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
@@ -600,7 +793,7 @@ def webscraper_successed(someurl,a,the_page):
         rewards[ 'rewards_level_description' ]=rewards_level_description
         rewards[ 'rewards_backers_level_distribution']= rewards_backers_level_distribution
         rewards[ 'pledge_limit' ]= listleftn(pledge_limit)
-        item['category']= ''.join(category).strip('\n')
+        item['category']= category
     return item, rewards , item[ 'Project_ID'] , item['project_state']
 
 def webscraper_failorcanceled(someurl,sel,the_page1):
@@ -663,8 +856,20 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
                         state_changed_at_str= word.split('&quot;:')[1]
         #location_id
 
-        location_id_str = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/div[1]/div/a[1]/text()')
+        category_location_str = sel.xpath('//*[@class="NS_projects__category_location ratio-16-9"]//*/text()')
+        try:
+            location_id_str=category_location_str[0]
+        except:
+            location_id_str='Error'
+
+
+        try:
+            category_str=category_location_str[1]
+        except:
+            category_str='Error'
+        #print 'location is %s ' %location_id_str
         location_id =''.join(location_id_str).strip('\n')
+        category=''.join(category_str).strip('\n')
         project_ID = ''.join(project_ID_str)
         launched_at=''.join(launched_at_str)
         created_at=''.join(created_at_str)
@@ -798,26 +1003,13 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
         creator_friends__facebook_number = 'Not connected'
         for word in creator_friends__facebook_number_potential:
             if 'created' in word:
-                creator_buildhistory_has_built_projects_number=word
+                creator_buildhistory_has_built_projects_number=word.split('\n')
             if 'backed' in word:
-                creator_buildhistory_has_backed_projects_number=word
+                creator_buildhistory_has_backed_projects_number=word.split('\n')
             if 'friend' in word:
                 creator_friends__facebook_number= word
-        #creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
-        #print creator_friends__facebook_number_potential_list,creator_friends__facebook_number_potential,type(creator_friends__facebook_number_potential)
 
-        #new data form
-        #                      //*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[5]/div/h3
-                              #//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[4]/div/h3
         state_other=sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[*]/div/h3/text()')
-        #state_other_2=sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[4]/div/h3/text()')
-
-
-
-         #                            //*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[5]/div/p/data
-        #state_changed_at_str = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[2]/div[3]/div/div[*]/div/p/data/@data-value')
-        #ptstate_changed_at = ''.join(state_changed_at_str).strip('"')
-        category = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/div[1]/div/a[2]/text()')
 
         #print state_changed_at
         deadline_date= ''.join(deadline_quot_str)
@@ -877,7 +1069,7 @@ def webscraper_failorcanceled(someurl,sel,the_page1):
         rewards[ 'rewards_level_description' ]=rewards_level_description
         rewards[ 'rewards_backers_level_distribution']= rewards_backers_level_distribution
         rewards[ 'pledge_limit' ]= listleftn(pledge_limit)
-        projectitem['category']= ''.join(category).strip()
+        projectitem['category']= category
     return projectitem, rewards , projectitem[ 'Project_ID'] , projectitem['project_state']
 
 def webscraper_live(someurl,sel,the_page1):
@@ -945,11 +1137,20 @@ def webscraper_live(someurl,sel,the_page1):
                         launched_at_str= word.split('&quot;:')[1]
         #location_id
         #createddate/set up date
-        category_str = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/div[1]/div/a[2]/text()')
-        #                     //*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/div[1]/div/a[2]/text()
+        category_location_str = sel.xpath('//*[@class="NS_projects__category_location ratio-16-9"]//*/text()')
+        try:
+            location_id_str=category_location_str[0]
+        except:
+            location_id_str='Error'
 
-        location_id_str = sel.xpath('//*[@id="content-wrap"]/section/div[2]/div/div[1]/div[2]/div[1]/div/a[1]/text()')
+
+        try:
+            category_str=category_location_str[1]
+        except:
+            category_str='Error'
+        #print 'location is %s ' %location_id_str
         location_id =''.join(location_id_str).strip('\n')
+        #category=''.join(category_str).strip('\n')
         project_ID = ''.join(project_ID_str)
         launched_at=''.join(launched_at_str)
         category = ''.join(category_str).strip('\n')
@@ -1078,9 +1279,9 @@ def webscraper_live(someurl,sel,the_page1):
         creator_friends__facebook_number = 'Not connected'
         for word in creator_friends__facebook_number_potential:
             if 'created' in word:
-                creator_buildhistory_has_built_projects_number=word
+                creator_buildhistory_has_built_projects_number=word.split('\n')
             if 'backed' in word:
-                creator_buildhistory_has_backed_projects_number=word
+                creator_buildhistory_has_backed_projects_number=word.split('\n')
             if 'friend' in word:
                 creator_friends__facebook_number= word
         creator_friends__facebook_number_potential=str(creator_friends__facebook_number_potential_list)
@@ -1296,9 +1497,15 @@ def progress_test(counts,lenfile,speed,w):
   #time.sleep()
 
 
+#def mainbody():
+
+
+
+
+
 
 if __name__ == '__main__':
-
+    global y
     print '***********************************************************'
     y=input('1) choose the number of workers for this jobs:')
     print '***********************************************************'
@@ -1308,15 +1515,17 @@ if __name__ == '__main__':
     url_file=input ('3) please enter the target url file for starting,need add /:')
     #url_file='/allleftofdataset.csv'
     gc.enable()
-
     global counts
     counts = 0
+    global total_item
+    global total_rewards_backers_distribution
+    global total_rewards_pledge_limit
+    global total_rewards_pledged_amount
+    #global y
     total_item=[]
     total_rewards_backers_distribution=[]
     total_rewards_pledge_limit=[]
     total_rewards_pledged_amount=[]
-    queue = Queue.Queue()
-
     print '\nsubjobs  begin!'
     (rewards_backers_distribution,rewards_pledge_limit,rewards_pledged_amount,saving_file,target_url_file,have_collected_url) = filepathcollection(publicpath,url_file)
 
@@ -1326,9 +1535,10 @@ if __name__ == '__main__':
                   'creator_personal_url','creator_has_backed_projects_number','creator_has_built_projects_number',
                   'creator_bio_info_url','creator_Facebook_url','currency','duration','location_ID','state_changed_at','created_at','launched_at','Deadline','description','category','project_state','has_a_video','comments_count','updates_number','data_percent_rasied','hours_left','creator_short_name','creator_friends_facebook_number']
     global file1
+    global collected
     (file1,collected) = createurlfromcsv(target_url_file,have_collected_url)
     print 'begin to collecting data'
-
+    queue = Queue.Queue()
     main(file1,y)
     collected_list_overwrite(collected,have_collected_url)
     #(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)=catchup(someurl,total_item,total_rewards_backers_distribution,total_rewards_pledge_limit,total_rewards_pledged_amount)
@@ -1338,9 +1548,9 @@ if __name__ == '__main__':
     writeacsvprocess(rewards_pledged_amount,rewards_headers,total_rewards_pledged_amount)
     counts=0
     print  '\nsubjobs completed!'
-    time.sleep(0.1)
+    #time.sleep(0.1)
 
-
+'''
     print 'saving process completed'
     target=  publicpath +'/project_data.csv'
     now =  datetime.datetime.today()
@@ -1355,3 +1565,4 @@ if __name__ == '__main__':
     attachmentFilePaths=pathfile
     sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
     print 'email sent'
+'''

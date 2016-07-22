@@ -78,20 +78,25 @@ def pre_update_request_url_process(self,someurls):
         content = urllib2.urlopen(someurls).read()
         sel= etree.HTML(content)
         status='Good'
-        return status,sel
+
         ##this is for some data without tab.
     except URLError as e:
         if hasattr(e, 'reason'):
-            pass
+            status='Error'
+            sel='Error'
+            
             #print 'We failed to reach a server.'
             #print 'Reason: ', e.reason
         elif hasattr(e, 'code'):
-            pass
+            status='Error'
+            sel='Error'
+
             #print 'The server couldn\'t fulfill the request.'
             #print 'Error code: ', e.code
-        status='Error'
-        sel='Error'
-        raise self.retry(exc=e,countdown=1)
+
+        #raise self.retry(exc=e,countdown=1)
+    finally:
+        return status,sel
 
 
 

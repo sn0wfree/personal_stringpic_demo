@@ -58,19 +58,24 @@ def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,le
     if project_info_single != {}:
         update_datetime=project_info_single['update_datetime']
         date={}
-        for j in xrange(0,len(update_datetime)):
-            date['%s'%j]=update_datetime[j]
-        date['Project_ID']=Project_ID
-        date['launched_at(=0)']=launched_at
-        date['Deadline']=Deadline
-        date['community_new_backers']=project_info_single['community_new_backers']
-        date['community_returning_backers']=project_info_single['community_returning_backers']
-        total_project_info.append(date)
-        collected.append(url)
-        counts+=1
-        date={}
+        if len(update_datetime)<=89:
+            for j in xrange(0,len(update_datetime)):
+                date['%s'%j]=update_datetime[j]
+            date['Project_ID']=Project_ID
+            date['launched_at(=0)']=launched_at
+            date['Deadline']=Deadline
+            date['community_new_backers']=project_info_single['community_new_backers']
+            date['community_returning_backers']=project_info_single['community_returning_backers']
+            total_project_info.append(date)
+            collected.append(url)
+            counts+=1
+            date={}
+            time.sleep(0.3+1/(len(total_project_info)+1))
+        else:
+            pass
 
-    time.sleep(0.3+1/(len(total_project_info)+1))
+
+
 
     if len(total_project_info)>50:
         #saving process

@@ -73,12 +73,13 @@ def conn_try_again(function):
 
 @celery.task(bind=True,max_retries=5,default_retry_delay=0.1 * 6)
 def pre_update_request_url_process(self,someurls):
-    global errorcounts
-    errorcounts=1
+
     try:
         content = urllib2.urlopen(someurls).read()
         sel= etree.HTML(content)
-          ##this is for some data without tab.
+        status='Good'
+        return status,sel
+        ##this is for some data without tab.
     except URLError as e:
         if hasattr(e, 'reason'):
             pass
@@ -88,23 +89,18 @@ def pre_update_request_url_process(self,someurls):
             pass
             #print 'The server couldn\'t fulfill the request.'
             #print 'Error code: ', e.code
-        #state='Error'
-        #sel=''
-        #the_page1=''
-        errorcounts+=1
+        status='Error'
+        sel='Error'
+        raise self.retry(exc=e,countdown=1)
+
+
+
+
+
         #raise self.retry(exc=e , countdown=1)
-    except:
-        state='Error'
-        sel=''
-        the_page1=''
-        errorcounts+=1
-    else:
-        the_page1=''
-        state='good'
-        errorcounts=0
-    finally:
-        if errorcounts==0 or errorcounts >5:
-            return state,sel,the_page1
+
+
+
 
 
 

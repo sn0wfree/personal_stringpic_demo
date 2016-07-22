@@ -1,5 +1,6 @@
 from plan import *
 import gc,time,datetime
+import celery
 
 
 def updateinfo(url,Project_ID,state):
@@ -132,55 +133,31 @@ def inputenver(status=0):
         saving_file_name='ucdata1.csv'
     return publicpp,filepath,saving_file_name
 
-if __name__ == "__main__":
-
+def mainbody():
     status=input('setup a status(0-99):')
     y=input('to choose the number of workers for this tasks:')
-
-
-
     (publicpp,filepath,saving_file_name)=inputenver(status)
-
-
-
-
     file1=publicpp+'/'+filepath
-
-
-
-
     global collected_file
     collected_file=publicpp+'/collected.txt'
-
-
-
-
     global saving_file
     saving_file=publicpp+'/'+saving_file_name
     #collected
-
-
     global collected
     collected=read_url_file(collected_file)
     projectdataset=readacsv(file1)
-
-
-
     urls=projectdataset['url'].values.tolist()
     #Project_IDs=projectdataset['Project_ID']
     #project_states=projectdataset['project_state']
     #Deadlines=projectdataset['Deadline']
     #launched_ats=projectdataset['launched_at']
     length=len(urls)
-
     tempp=[]
     for i in xrange(0,length):
         if urls[i] in collected:
             tempp.append(i)
     for j in tempp:
         projectdataset=projectdataset.drop(j,axis=0)
-
-
             #Project_IDs.drop('%s'%i)
             #project_states.drop('%s'%i)
             #Deadlines.drop('%s'%i)
@@ -227,3 +204,6 @@ if __name__ == "__main__":
     attachmentFilePaths=pathfile
     sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
     print 'email sent'
+
+if __name__ == "__main__":
+    mainbody()

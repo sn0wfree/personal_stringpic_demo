@@ -1406,10 +1406,6 @@ def progress_test(counts,lenfile,speed,w):
 #def mainbody():
 
 
-
-
-
-
 if __name__ == '__main__':
     global y
     print '***********************************************************'
@@ -1420,9 +1416,11 @@ if __name__ == '__main__':
     #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/data/sample folder'
     url_file=input ('3) please enter the target url file for starting,need add /:')
     print '________________________________________________________________'
-    mail=input('mail it (1 or 0):')
+    mail = input('mail it?(1 or 0):')
+    if mail ==1:
+        mail_password=input('please enter mail password:')
     #if mail !=0 or mail !=1:
-    if mail<0:
+    elif mail<0:
         justajoke(mail)
     else:
         pass
@@ -1473,7 +1471,7 @@ if __name__ == '__main__':
 
         print 'begin sending email'
         mail_username='linlu19920815@gmail.com'
-        mail_password='19920815'
+
         to_addrs="snowfreedom0815@gmail.com"
         attachmentFilePaths=pathfile
         sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)

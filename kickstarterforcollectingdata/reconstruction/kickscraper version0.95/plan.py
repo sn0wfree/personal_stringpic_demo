@@ -10,7 +10,7 @@ this code is for my dissertation.
 
 
 __author__='sn0wfree'
-__version__='2.3.3.2'
+__version__='2.3.3.3'
 
 
 
@@ -53,26 +53,49 @@ import celery
 
 
 #someurl='https://www.kickstarter.com/projects/399230478/the-horror-of-loon-lake-revealed?ref=category_newest'
-def conn_try_again(function):
-    RETRIES = 0
-    #重试的次数
-    count = {"num": RETRIES}
-    def wrapped(*args, **kwargs):
-        try:
-            return function(*args, **kwargs)
-        except Exception, err:
-            if count['num'] < 5:
-                time.sleep(1)
-                count['num'] += 1
-                return wrapped(*args, **kwargs)
-            else:
-                raise Exception(err)
-    return wrapped
+def conn_try_again(max_retries=5,default_retry_delay=1):
+    def _conn_try_again(function):
+        RETRIES = 0
+        #重试的次数
+        count = {"num": RETRIES}
+        def wrapped(*args, **kwargs):
+            try:
+                return function(*args, **kwargs)
+            except Exception, err:
+                if count['num'] < max_retries:
+                    time.sleep(default_retry_delay)
+                    count['num'] += 1
+                    return wrapped(*args, **kwargs)
+                else:
+                    status='Error'
+                    sel='Error'
+                    raise Exception(err)
+        return wrapped
+    return _conn_try_again
+
+def chunks(item,n):
+    lenitem=len(item)
+    dic={}
+    #split item by n
+    for i in xrange(0,lenitem,n):
+        if i+n < lenitem:
+            dic[i]=item[i:i+n]
+        else:
+            dic[i]=item[i:]
+    return dic
 
 
+def deco(arg):
+    def _deco(func):
+        def __deco():
+            print("before %s called [%s]." % (func.__name__, arg))
+            func()
+            print("  after %s called [%s]." % (func.__name__, arg))
+        return __deco
+    return _deco
 
-@celery.task(bind=True,max_retries=5,default_retry_delay=0.1 * 6)
-def pre_update_request_url_process(self,someurls):
+@conn_try_again(max_retries=5,default_retry_delay=1)
+def pre_update_request_url_process(someurls):
 
     try:
         content = urllib2.urlopen(someurls).read()
@@ -84,150 +107,16 @@ def pre_update_request_url_process(self,someurls):
         if hasattr(e, 'reason'):
             status='Error'
             sel='Error'
-            
             #print 'We failed to reach a server.'
             #print 'Reason: ', e.reason
         elif hasattr(e, 'code'):
             status='Error'
             sel='Error'
-
             #print 'The server couldn\'t fulfill the request.'
             #print 'Error code: ', e.code
-
         #raise self.retry(exc=e,countdown=1)
     finally:
         return status,sel
-
-
-
-
-
-        #raise self.retry(exc=e , countdown=1)
-
-
-
-
-
-
-
-
-
-
-
-def updateinfo(url,Project_ID,state):
-    update_dict={}
-    if state=='successful':
-        url_update=url
-    else:
-        if '?ref=' in url:
-            url_split=url.split('?ref=')[0]
-        else:
-            url_split=''
-        if url_split !='':
-            url_update=url_split+'/updates'
-        else:
-            url_update=''
-
-    (state,sel,the_page1)=pre_update_request_url_process(url_update,state)
-    if state !='Error':
-        #if state=='live'
-                                #   //*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[2]
-                                #   //*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/div/div[1]/time//@datetime
-                                    #//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div
-                                    #//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[2]/div/div[1]/time
-                                                                                      #//*[@class="timeline"]/div[*]//@datetime
-        update_datetime =sel.xpath('//*[@class="timeline"]/div[*]//@datetime')
-        update_description=sel.xpath('//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/a/div[1]/p')
-        update_interactive1=sel.xpath('//*[@class="timeline"]//*[@class="grid-post__metadata"]/span[1]/text()')
-        update_interactive2=sel.xpath('//*[@class="timeline"]//*[@class="grid-post__metadata"]/span[2]/text()')
-
-        #update_comments=sel.xpath('//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/a/div[2]/span[1]//text()')
-        #update_like=sel.xpath('//*[@id="content-wrap"]/div[2]/section[3]/div/div/div/div/div[*]/a/div[2]/span[2]//text()')
-        print len(update_interactive1),update_interactive1[0]
-        #print update_interactive1 comment
-        Comment_index=''
-        for el1 in update_interactive1:
-            if el1 !='\n':
-                if 'Comment' in el1 :
-                    Comment_index='Comment in update_interactive1'
-                    update_comments=update_interactive1
-                    update_like=update_interactive2
-                    break
-
-        for el2 in update_interactive2:
-            if el2 !='\n':
-                if 'Comment' in el2 :
-                    Comment_index='Comment in update_interactive2'
-                    update_comments=update_interactive2
-                    update_like=update_interactive1
-                    break
-
-        if Comment_index =='':
-            for el1 in update_interactive1:
-                if el1 !='\n':
-                    if 'like' in el1 :
-                        like_index='like in update_interactive1'
-                        update_like=update_interactive1
-                        update_comments=update_interactive2
-                        break
-            for el2 in update_interactive2:
-                if el2 !='\n':
-                    if 'like' in el2 :
-                        like_index='like in update_interactive2'
-                        update_like=update_interactive2
-                        update_comments=update_interactive1
-                        break
-        else:
-            update_like=update_interactive2
-            update_comments=update_interactive1
-
-
-
-
-
-        #if  'Comment' in [el2 for el2 in  update_interactive2]:
-        #    update_like=update_interactive1
-        #    update_comments=update_interactive2
-        #    print 'Comment in update_interactive2'
-        #elif 'like' in [el2 for el2 in  update_interactive2]:
-        #    update_like=update_interactive2
-        #    update_comments=update_interactive1
-        #    print 'like in update_interactive2'
-        #elif 'like' in [el1 for el1 in  update_interactive1]:
-        #    update_like=update_interactive1
-        #    update_comments=update_interactive2
-        #    print 'like in update_interactive1'
-        #elif 'Comment' in [el1 for el1 in update_interactive1]:
-        #    update_like=update_interactive2
-        #    update_comments=update_interactive1
-        #
-        #    print 'comment in update_interactive1'
-        #
-        #else:
-        #    print 'cannot find'
-        #    update_like=update_interactive1
-        #    update_comments=update_interactive2
-
-        update_dict['update_datetime']=update_datetime
-        update_dict['update_description']=update_description
-        update_dict['update_comments']=update_comments
-        update_dict['update_like']=update_like
-        #update_dict['update_interactive1']=update_interactive1
-        #update_dict['update_interactive2']=update_interactive2
-        update_dict['Project_ID']=Project_ID
-    return update_dict
-
-
-
-
-
-
-
-
-
-
-
-
 
 #compress process suite
 def zipafilefordelivery(file,target):
@@ -246,7 +135,6 @@ def read_url_file(file):
         file_unclear = []
         file_unclear_list =file_unclear_file.readlines()
         for x in file_unclear_list:
-
             a=x.split()
             if a!=[]:
                 file_unclear.append(a[0])
@@ -260,9 +148,6 @@ def projetcdata_txt_wholewrite(item,file):
     f= open(file,'a')
     f.write(str(item))
     f.close()
-
-
-
 
 
 def collected_list_overwrite(item,file):
@@ -406,6 +291,7 @@ def datagenerateprocess(url,state,sel,the_page1):
     return item,rewards,ID,state
 
 def compareindexprocess(url):
+
     if url!=[] and type(url)!=float:
         someurl =''.join(url.split())
     else:
@@ -490,6 +376,21 @@ def creator_another_related_project_seek_process(creator_has_built_projects_numb
                                 #sel.xpath('//*[@id="bio"]/div/div[2]/div[4]/text()[1]')'
 #/profile/mogeesplay/created
 #---------------------------------------------------------------------
+def justajoke():
+    for x in xrange(0,10000):
+        dash_r='/'*random.randint(1,1000)
+        star_r='*'*random.randint(1,1000)
+        wave_r='~'*random.randint(1,1000)
+        point_r='.'*random.randint(1,1000)
+        bracks_r='()'*random.randint(1,1000)
+        A_r='A'*random.randint(1,1000)
+        question_r='?'*random.randint(1,1000)
+        strrr=dash_r+star_r+wave_r+point_r+bracks_r+A_r+question_r
+        symbol=list(strrr)[random.randint(1,len(strrr)-1)]
+        for j in xrange(0,10000):
+            symbol+=list(strrr)[random.randint(1,len(strrr)-1)]
+        sys.stdout.write('/r %s'%symbol)
+        sys.stdout.flush()
 #main collection process
 def webscraper_successed(someurl,a,the_page):
     root_url = 'https://www.kickstarter.com'
@@ -1486,14 +1387,14 @@ class ThreadClass(threading.Thread):
             self.queue.task_done()
 #progress_bar
 def progress_test(counts,lenfile,speed,w):
-    bar_length=30
+    bar_length=20
     eta=time.time()+w
     precent =counts/float(lenfile)
 
     ETA=datetime.datetime.fromtimestamp(eta)
     hashes = '#' * int(precent * bar_length)
     spaces = ' ' * (bar_length - len(hashes))
-    sys.stdout.write("""\r%d%%|%s|read %d projects|ETA: %s """ % (precent*100,hashes + spaces,counts,ETA))
+    sys.stdout.write("""\r%d%%|%s|read %d projects|Speed : %.4f |ETA: %s """ % (precent*100,hashes + spaces,counts,speed,ETA))
 
     #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects" % (counts,f2-f1))
 
@@ -1518,6 +1419,13 @@ if __name__ == '__main__':
     print '=============================================================='
     #publicpath='/Users/sn0wfree/Dropbox/BitTorrentSync/data/sample folder'
     url_file=input ('3) please enter the target url file for starting,need add /:')
+    print '________________________________________________________________'
+    mail=input('mail it (1 or 0):')
+    #if mail !=0 or mail !=1:
+    if mail<0:
+        justajoke(mail)
+    else:
+        pass
     #url_file='/allleftofdataset.csv'
     gc.enable()
     global counts
@@ -1555,19 +1463,30 @@ if __name__ == '__main__':
     print  '\nsubjobs completed!'
     #time.sleep(0.1)
 
-'''
-    print 'saving process completed'
-    target=  publicpath +'/project_data.csv'
-    now =  datetime.datetime.today()
-    pathfile=publicpath+ '/%s.zip' % now
-    print 'compress process completed'
-    zipafilefordelivery(pathfile,target)
+    if mail == 1:
+        print 'saving process completed'
+        target=  publicpath +'/project_data.csv'
+        now =  datetime.datetime.today()
+        pathfile=publicpath+ '/%s.zip' % now
+        print 'compress process completed'
+        zipafilefordelivery(pathfile,target)
 
-    print 'begin sending email'
-    mail_username='linlu19920815@gmail.com'
-    mail_password='19920815'
-    to_addrs="snowfreedom0815@gmail.com"
-    attachmentFilePaths=pathfile
-    sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
-    print 'email sent'
-'''
+        print 'begin sending email'
+        mail_username='linlu19920815@gmail.com'
+        mail_password='19920815'
+        to_addrs="snowfreedom0815@gmail.com"
+        attachmentFilePaths=pathfile
+        sendmailtodelivery(mail_username,mail_password,to_addrs,attachmentFilePaths)
+        print 'email sent'
+    else:
+        print 'TAT, coding is tough job for non-computer science students'
+
+
+
+
+
+        #sys.stdout.write("\rthis spider has already read %d projects, speed: %.4f/projects" % (counts,f2-f1))
+
+        #sys.stdout.write("\rPercent: [%s] %d%%,remaining time: %.4f mins"%(hashes + spaces,precent,w))
+
+      #time.sleep()

@@ -1,6 +1,6 @@
 from plan import *
 import gc,time,datetime
-import celery
+#import celery
 
 
 def updateinfo(url,Project_ID,state):

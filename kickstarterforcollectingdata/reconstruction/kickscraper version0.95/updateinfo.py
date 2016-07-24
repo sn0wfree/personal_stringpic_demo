@@ -44,7 +44,7 @@ def updateinfo(url,Project_ID,state):
 
     return update_community_dict
 
-def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,length):
+def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,total_current_counts):
     global total_project_info
     global counts
     global saving_file
@@ -53,7 +53,7 @@ def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,le
 
     update_headers=['Project_ID','community_returning_backers','community_new_backers','launched_at(=0)','Deadline','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89']
 
-    #for i in xrange(0,length):
+
     project_info_single=updateinfo(url,Project_ID,project_state)
     if project_info_single != {}:
         f1 =time.time()
@@ -72,7 +72,7 @@ def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,le
         date['community_returning_backers']=project_info_single['community_returning_backers']
         total_project_info.append(date)
         date={}
-        collected.append(Project_ID)
+        #collected.append(Project_ID)
         time.sleep(random.uniform(0.1,0.5))
         counts+=1
 
@@ -81,7 +81,6 @@ def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,le
             total_project_info=[]
             #collected_w=collected
             #saving process
-            #collected_list_overwrite(collected_w,collected_file)
             writeacsvprocess(saving_file,update_headers,total_project_info_w)
             gc.collect()
             accesstime_control+=1
@@ -97,7 +96,7 @@ def updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,le
         else:
             pass
         f2=time.time()
-        w=(length-counts)*(f2-f1)/y
+        w=(total_current_counts-counts)*(f2-f1)/y
         progress_test(counts,total_current_counts,f2-f1,w)
 
 
@@ -122,11 +121,9 @@ class ThreadupdateClass(threading.Thread):
             project_state=task['project_state']
             Deadline=task['Deadline']
             launched_at=task['launched_at']
-            updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,length)
-
+            updatecollectionprocess(url,Project_ID,project_state,Deadline,launched_at,total_current_counts)
             #time.sleep(1/10)
             self.queue.task_done()
-
 
 def chunks(item,n):
     lenitem=len(item)
@@ -170,180 +167,117 @@ def inputenver(status=0):
 
     return publicpp,filepath,saving_file_name
 
-if __name__ == "__main__":
-    global collect_all_code
-    global total_current_counts
-    global collected_file,collected
+def updateinfo_mainbodyprocess(status,y):
     global saving_file
-    global collected
+
     global accesstime_control
     global total_project_info
     global counts
+    global total_current_counts
+    accesstime_control=0
+    counts=0
+    total_current_counts=0
+
+    (publicpp,filepath,saving_file_name)=inputenver(status)
+    file1=publicpp+'/'+filepath
+
+    saving_file=publicpp+'/'+saving_file_name
+
+    print 'reading/loading files'
+
+    collected_f=readacsv(saving_file)
+    projectdataset=readacsv(file1)
+
+    Project_IDs=projectdataset['Project_ID'].values.tolist()
+    collected=collected_f['Project_ID'].values.tolist()
+
+    length=len(Project_IDs)
+    tempp=[]
+    for i in xrange(0,length):
+        if Project_IDs[i] in collected:
+            tempp.append(i)
+    for j in tempp:
+        projectdataset=projectdataset.drop(j,axis=0)
+    tasks=[]
+    urls=projectdataset['url'].values.tolist()
+    Project_IDs=projectdataset['Project_ID'].values.tolist()
+    project_states=projectdataset['project_state'].values.tolist()
+    Deadlines=projectdataset['Deadline'].values.tolist()
+    launched_ats=projectdataset['launched_at'].values.tolist()
+
+    total_current_counts =len(urls)
+    total_project_info=[]
+    print 'pre-handle process begin'
+    for j in xrange(0,total_current_counts):
+        temp={}
+        temp['url']=urls[j]
+        temp['Project_ID']=Project_IDs[j]
+        temp['project_state']=project_states[j]
+        temp['Deadline']=Deadlines[j]
+        temp['launched_at']=launched_ats[j]
+        tasks.append(temp)
+    print 'ROM recycle activited'
+    gc.enable()
+
+
+    print 'begin to crwal'
+    print 'there are left %d projects'%total_current_counts
+    update_headers=['Project_ID','community_returning_backers','community_new_backers','launched_at(=0)','Deadline','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89']
+
+
+    #tasks_split=chunks(tasks,50)
+    #for task in tasks_split:
+
+    mainupdate(tasks,y)
+    #total_project_info
+    writeacsvprocess(saving_file,update_headers,total_project_info)
+    time.sleep(random.random())
+
+
+if __name__ == "__main__":
+
+
+
+
     queue = Queue.Queue()
+    #initial threads
+
+
 
     status=input('setup a status(0-99):')
     y=input('to choose the number of workers for this tasks:')
     mail = input('mail it?(1 or 0):')
+    for j in xrange(y):
+        t = ThreadupdateClass(queue)
+        t.setDaemon(True)
+        t.start()
     if mail ==1:
         mail_password=input('please enter mail password:')
     else:
         pass
 
     if status !='all':
-        accesstime_control=0
-        counts=0
-        total_current_counts=0
-
         print 'single colelction model'
-        (publicpp,filepath,saving_file_name)=inputenver(status)
-        file1=publicpp+'/'+filepath
+        updateinfo_mainbodyprocess(status,y)
 
-        #collected_file=publicpp+'/collected.txt'
-
-        saving_file=publicpp+'/'+saving_file_name
-        #collected
-
-        print 'reading/loading files'
-        #collected=read_url_file(collected_file)
-        collected_f=readacsv(saving_file)
-
-
-        projectdataset=readacsv(file1)
-
-        Project_IDs=projectdataset['Project_ID'].values.tolist()
-        collected=collected_f['Project_ID'].values.tolist()
-
-
-        length=len(Project_IDs)
-        tempp=[]
-        for i in xrange(0,length):
-            if Project_IDs[i] in collected:
-                tempp.append(i)
-        for j in tempp:
-            projectdataset=projectdataset.drop(j,axis=0)
-        tasks=[]
-        urls=projectdataset['url'].values.tolist()
-        Project_IDs=projectdataset['Project_ID'].values.tolist()
-        project_states=projectdataset['project_state'].values.tolist()
-        Deadlines=projectdataset['Deadline'].values.tolist()
-        launched_ats=projectdataset['launched_at'].values.tolist()
-
-        total_current_counts =len(urls)
-        total_project_info=[]
-        print 'pre-handle process begin'
-        for j in xrange(0,len(urls)):
-            temp={}
-            temp['url']=urls[j]
-            temp['Project_ID']=Project_IDs[j]
-            temp['project_state']=project_states[j]
-            temp['Deadline']=Deadlines[j]
-            temp['launched_at']=launched_ats[j]
-            tasks.append(temp)
-        print 'ROM recycle activited'
-        gc.enable()
-
-
-        print 'begin to crwal'
-        print 'there are left %d projects'%total_current_counts
-        update_headers=['Project_ID','community_returning_backers','community_new_backers','launched_at(=0)','Deadline','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89']
-
-        #initial threads
-        #def initila_thread_process():
-        for j in xrange(y):
-            t = ThreadupdateClass(queue)
-            t.setDaemon(True)
-            t.start()
-        #tasks_split=chunks(tasks,50)
-        #for task in tasks_split:
-
-        mainupdate(tasks,y)
-        total_project_info_w=total_project_info
-
-        #collected_w=collected
-        #collected_list_overwrite(collected_w,collected_file)
-        writeacsvprocess(saving_file,update_headers,total_project_info_w)
-        time.sleep(random.random())
-
-        #print total_project_info
     elif status =='all':
-        accesstime_control=0
-        counts=0
+
         print 'all collection model'
-        a=[1,2,3,4]
-        for number in a:
-            print 'begin collecting %s part of data'%number
+        a_part=[1,2,3,4]
+        for number in a_part:
+            if number ==1:
+                print 'begin to collect %sst part of data'%number
+            elif number ==2:
+                print 'begin to collect %snd part of data'%number
+            elif number ==3:
+                print 'begin to collect %srd part of data'%number
+            else:
+                print 'begin to collect %sth part of data'%number
 
             status= number*1000
-            (publicpp,filepath,saving_file_name)=inputenver(status)
-            file1=publicpp+'/'+filepath
-
-            collected_file=publicpp+'/collected.txt'
-
-            saving_file=publicpp+'/'+saving_file_name
-            #collected
-
-            print 'reading/loading files'
-            collected_f=readacsv(saving_file)
+            updateinfo_mainbodyprocess(status,y)
 
 
-            projectdataset=readacsv(file1)
-
-            Project_IDs=projectdataset['Project_ID'].values.tolist()
-            collected=collected_f['Project_ID'].values.tolist()
-
-            length=len(Project_IDs)
-            tempp=[]
-            for i in xrange(0,length):
-                if Project_IDs[i] in collected:
-                    tempp.append(i)
-            for j in tempp:
-                projectdataset=projectdataset.drop(j,axis=0)
-            tasks=[]
-            urls=projectdataset['url'].values.tolist()
-            Project_IDs=projectdataset['Project_ID'].values.tolist()
-            project_states=projectdataset['project_state'].values.tolist()
-            Deadlines=projectdataset['Deadline'].values.tolist()
-            launched_ats=projectdataset['launched_at'].values.tolist()
-
-            total_current_counts =len(urls)
-
-            total_project_info=[]
-            print 'pre-handle process begin'
-            for j in xrange(0,len(urls)):
-                temp={}
-                temp['url']=urls[j]
-                temp['Project_ID']=Project_IDs[j]
-                temp['project_state']=project_states[j]
-                temp['Deadline']=Deadlines[j]
-                temp['launched_at']=launched_ats[j]
-                tasks.append(temp)
-            print 'ROM recycle activited'
-            gc.enable()
-
-
-            print 'begin to crwal'
-            print 'there are left %d projects'%total_current_counts
-
-            update_headers=['Project_ID','community_returning_backers','community_new_backers','launched_at(=0)','Deadline','0','1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31','32','33','34','35','36','37','38','39','40','41','42','43','44','45','46','47','48','49','50','51','52','53','54','55','56','57','58','59','60','61','62','63','64','65','66','67','68','69','70','71','72','73','74','75','76','77','78','79','80','81','82','83','84','85','86','87','88','89']
-
-            #initial threads
-            #def initila_thread_process():
-            for j in xrange(y):
-                t = ThreadupdateClass(queue)
-                t.setDaemon(True)
-                t.start()
-            #tasks_split=chunks(tasks,50)
-            #for task in tasks_split:
-
-            mainupdate(tasks,y)
-            total_project_info_w=total_project_info
-
-            collected_w=collected
-            #collected_list_overwrite(collected_w,collected_file)
-            writeacsvprocess(saving_file,update_headers,total_project_info_w)
-            time.sleep(random.random())
-
-            #print total_project_info
 
 
 

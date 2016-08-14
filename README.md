@@ -17,20 +17,20 @@ and the aim is for help myself to access the crowdfunding field what may i need.
 -----------------------------------------------
 
 ## 1. included materials
->In those code files, those may include some useless materials for other people who want to read.Here,i just show the important materials if you want to use mine code.These have three folders which may include a lots of .py files
+>In those code files, those may include some useless materials for other people who want to read.Here,i just show the important materials if you want to use my code.These have three folders which may include a lots of .py files
 
 if you are intersted in this project, first folder which is **kickstarterforcollectingdata** should be focus on.
 
 ### **kickstarterforcollectingdata**
-- this folder include main spider program
+- this folder include main spiderbot program
 - in the **kickstarterforcollectingdata** folder, you can find a folder named **reconstruction** . 
-	- any things you want all saving in this folder
+	- any things you want are all saved in this folder
 - there is only one file you may be interested in: plan.py
 	
 
 ## 2.files
 - you may find a lot of txt files and csv or xlsx files, that are some data what i have collected until 4 July 2016. 
--PS: i will clean up those useless files when i finish my dissertation finally
+-PS: i will fully clean up those useless files when i finish my dissertation finally
 
 ## 3. codes
 - I use python 2.7 to code  
@@ -54,7 +54,7 @@ rewards_pledged_amount.csv
 
 ## 5.upgrade
 - for now, i still try to upgrade my code, untill i finish my disseration.
-- now i'm work on covering the projects which  cannnot be searched from category pages
+- now i'm working on covering the projects which  cannnot be searched from category pages
 
 
 

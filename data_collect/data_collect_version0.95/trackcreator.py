@@ -5,12 +5,13 @@
 '''
 this code is for my dissertation.
 
-@file: plan.py
+
 @author: Lin Lu(sn0wfree)
 @version：1.0
 
 '''
-#__version__='0.1'
+__version__='0.1'
+__author__='sn0wfree'
 #-----------------------------------------------------------------------------------------------
 ###
 from plan import *

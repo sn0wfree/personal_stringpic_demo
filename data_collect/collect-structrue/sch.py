@@ -19,4 +19,4 @@ import cookie
 #database,sql
 
 
-#main code for spider
+#main body for spider

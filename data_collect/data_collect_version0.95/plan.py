@@ -52,6 +52,7 @@ import celery
 
 
 
+
 #someurl='https://www.kickstarter.com/projects/399230478/the-horror-of-loon-lake-revealed?ref=category_newest'
 def conn_try_again(max_retries=5,default_retry_delay=1):
     def _conn_try_again(function):

@@ -1404,13 +1404,10 @@ def progress_test(counts,lenfile,speed,w):
 
 
 #def mainbody():
-def smileface:
-    __length__=30
-    dash='-'
-    hashes='#'
-    spaces=' '
-    p= ' ' * int((__length__-1)/2)+'-'*1+' '*int((__length__-1)/2)
-    print '%s' p
+#def sn0wfree_s_demo:
+
+
+
 
 
 

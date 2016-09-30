@@ -1,5 +1,10 @@
 #cookies
 import cookie
+
+#js context
+
+
+
 #code utf-8?gbk?
 
 #tag incom

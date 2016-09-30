@@ -25,6 +25,20 @@ class TestPlatform:
         self.python_compiler=platform.python_compiler()#  获取系统中python解释器的信息
         self.otherinfo=platform.uname()#  other
         self.platform_system=platform.system()#system
+    def UsePlatform(self, returnornot=False):
+        sysstr = self.platform_system
+        if returnornot:
+            return sysstr
+        else:
+            pass
+        #if(sysstr =="Windows"):
+        #    return ("Call Windows tasks")
+        #elif(sysstr == "Linux"):
+        #    print ("Call Linux tasks")
+        #elif(sysstr == "Darwin"):
+        #     print ("Call Darwin or Mac tasks")
+        #else:
+        #    print ("Other System tasks")
 
 
 
@@ -38,14 +52,7 @@ class TestPlatform:
 
 
 
-def UsePlatform( ):
-    sysstr = platform.system()
-    if(sysstr =="Windows"):
-        print ("Call Windows tasks")
-    elif(sysstr == "Linux"):
-        print ("Call Linux tasks")
-    else:
-        print ("Other System tasks")
+
 
 
 

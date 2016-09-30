@@ -1,5 +1,5 @@
 #cookies
-
+import cookie
 #code utf-8?gbk?
 
 #tag incom

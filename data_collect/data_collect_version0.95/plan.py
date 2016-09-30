@@ -376,7 +376,7 @@ def creator_another_related_project_seek_process(creator_has_built_projects_numb
                                 #sel.xpath('//*[@id="bio"]/div/div[2]/div[4]/text()[1]')'
 #/profile/mogeesplay/created
 #---------------------------------------------------------------------
-def justajoke():
+def justajoke(mail):
     for x in xrange(0,10000):
         dash_r='/'*random.randint(1,1000)
         star_r='*'*random.randint(1,1000)
@@ -1404,6 +1404,14 @@ def progress_test(counts,lenfile,speed,w):
 
 
 #def mainbody():
+def smileface:
+    __length__=30
+    dash='-'
+    hashes='#'
+    spaces=' '
+    p= ' ' * int((__length__-1)/2)+'-'*1+' '*int((__length__-1)/2)
+    print '%s' p
+
 
 
 if __name__ == '__main__':
@@ -1421,7 +1429,12 @@ if __name__ == '__main__':
         mail_password=input('please enter mail password:')
     #if mail !=0 or mail !=1:
     elif mail<0:
-        justajoke(mail)
+        confirm=input('confirm?:yes or no')
+        if confirm == 'yes':
+            justajoke(mail)
+            print ''
+        else:
+            pass
     else:
         pass
     #url_file='/allleftofdataset.csv'

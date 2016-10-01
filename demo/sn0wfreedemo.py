@@ -1,5 +1,6 @@
 #coding=utf-8
-import os,platform,sys
+
+import os,platform,sys,gc,time
 from PIL import Image
 import pandas as pd
 import numpy as np
@@ -17,12 +18,12 @@ def get_terminal_bound():
 class TestPlatform:
     def __init__(self):
         self.python_version = platform.python_version() # Python version
-        self.platform_architecture = platform.architecture()#programme structure(’32bit’, ‘WindowsPE’)
+        self.platform_architecture = platform.architecture()#programme structure('32bit', 'WindowsPE')
         self.node = platform.node() # name
-        self.platform_version=platform.version()#  获取操作系统的core版本
-        self.platform_name_version = platform.platform()#获取操作系统名称及版本号，Windows-7-6.1.7601-SP1
-        self.processor = platform.processor()#计算机处理器信息，’Intel64 Family 6 Model 42 Stepping 7, GenuineIntel’
-        self.python_compiler=platform.python_compiler()#  获取系统中python解释器的信息
+        self.platform_version=platform.version()#  capture operator system's core version
+        self.platform_name_version = platform.platform()#capture operator system,Windows-7-6.1.7601-SP1
+        self.processor = platform.processor()#computer processor info,'Intel64 Family 6 Model 42 Stepping 7, GenuineIntel'
+        self.python_compiler=platform.python_compiler()#
         self.otherinfo=platform.uname()#  other
         self.platform_system=platform.system()#system
     def UsePlatform(self, returnornot=False):
@@ -109,23 +110,52 @@ class pic2symboltext:
         self.height = int(rows)
         self.system= platform.system()#system
         self.symboldataset=None
+        self.resize=(0,0)
 
 
     def preprocess(self,img_name):
-
         img = Image.open(img_name)
         img_w, img_h = img.size
         #img_m = max(img.size)
-        windows_w=self.width
-        windows_h=self.height
-        img = img.resize((w,h))
+        windows_w=float(self.width)
+        windows_h=float(self.height)
         #img = img.convert('L')
-        '接下来写图片调整大小调整程序'
-
+        'resize picture process'
+        #resize_num=windows_h/img_h
+        scaleX=windows_w/img_w
+        scaleY=windows_h/img_h
+        scale=min(scaleY, scaleX)
+        resize_w=scale*img_w
+        resize_h=scale*img_h
+        resize=(int(resize_w),int(resize_h))
+        #if img_h >= windows_h:
+        #    resize_h=windows_h
+            #print img_h,windows_h
+        #    resize_w=resize_h*4/3
+            #print resize_w
+        #    if resize_w <= windows_w:
+        #        resize=(int(resize_w),int(resize_h))
+        #    elif resize_w > windows_w:
+        #        resize_new_w=windows_w
+        #        resize_new_h=resize_new_w*3/4
+        #        resize=(int(resize_new_w),int(resize_new_h))
+        #elif img_h < windows_h:
+        #    resize_h=img_h
+        #    if img_w <= windows_w:
+        #        resize_w=img_w
+        #        resize=(int(resize_w),int(resize_h))
+        #    elif img_w > windows_w:
+        #        resize_new_w = windows_w
+        #        resize_new_h=resize_h*3/4
+        #        resize=(int(resize_new_w),int(resize_new_h))
+        #print resize
+        img = img.resize(resize, Image.ANTIALIAS)
+        self.resize=resize
 
         return img
 
-    def pandalizationfortest(self,character_image):
+    def pandalizationfortest(self,img_name):
+        character_image=self.preprocess(img_name)
         pix=character_image.load()
         self.symboldataset=np.zeros((character_image.size[1],character_image.size[0]))
         data=self.scan_rep(pix,character_image)
@@ -140,28 +170,25 @@ class pic2symboltext:
         for i in xrange(character_image.size[0]):
             for j in xrange(character_image.size[1]):
                 data[j,i]=pix[i,j][0]
-                #if data[i][j]<10:
-                #    data[i][j]=0
-                #else:
-                #    data[i][j]=1
-
-
-
+                if 242<=data[j,i]<=255:
+                    data[j,i]= 5
+                    #5'%'
+                elif 230<=data[j,i]<242:
+                    data[j,i]= 4
+                    #4'@'
+                elif 150<=data[j,i]<230:
+                    data[j,i]= 3
+                    #3'#'
+                elif 94<=data[j,i]<150:
+                    data[j,i]= 2
+                    #2'*'
+                elif 38<=data[j,i]<94:
+                    data[j,i]= 1
+                    #1'.'
+                elif 0<=data[j,i]<38:
+                    data[j,i]= 0
+                    #0' '
         return data
-
-
-    #def create_symbol_text(img):
-    #    """ 将已经预处理好的图片根据color生成字符字符串，存放到 pic_str 变量中 """
-    #    pix = img.load()
-    #    pic_str = ''
-    #    width, height = img.size
-    #    pandalizationfortest（img）
-
-
-
-                    #pic_str += color[int(pix[w,h]) * 14 /255]
-                #pic_str += '\n'
-        return pic_str
 
 
 
@@ -171,19 +198,6 @@ class pic2symboltext:
         for x in xrange(h):
             sys.stdout.write ('*'*length)
             sys.stdout.flush()
-
-
-
-
-def bmp2png(bmp_img_name):
-    name,ext = os.path.splitext(bmp_img_name)
-    if ext.lower() == '.bmp':
-        target= name +'.png'
-    Image.open(bmp_img_name).save(target)
-
-    pass
-
-
 
 def getDirList( p ):
         p = str( p )
@@ -196,47 +210,137 @@ def getDirList( p ):
         b = [ x   for x in a if os.path.isdir( p + x ) ]
         return b
 
-def scanfolderprocess(rdir):
-    fo=os.walk(rdir)
-    f=[]
-    for root,subfolder,files in fo:
-        #print root
-        num=root.lstrip(rdir)
-        #print num,type(num)
-
-    return f
-
-
 #def multi_scan(img):
 #    pool = mp.Pool()
     #for rdir in rdirs:
 #    yv=pool.map
 
+def scan_all_pic_file_process(rdir):
+    fo=os.walk(rdir)
+    f=[]
+    for (root,subfolder,files_a) in fo:
+        pass
+    for file_a in files_a:
+        full_path_for_each_bmp=(root,file_a)
+        f.append(full_path_for_each_bmp)
+        #print root
+        #num=root.lstrip(rdir)
+        #print num,type(num)
+    return f
+
+def showoutput(img_file_png,preload=False,text=False):
+    plist=[]
+    p=pic2symboltext()
+    #print 'terminal_bound:%s,%s' %(p.width,p.height)
+    #p_img=p.preprocess(a)
+    p_data=p.pandalizationfortest(img_file_png)
+    #print p_data[44:45]
+    extra_symbol=(p.width-p.resize[0])/2
+    if preload == False:
+        for x in xrange(len(p_data)):
+            example=p_data[x:x+1].values.tolist()[0]
+            print_list=' '*extra_symbol
+            for e in example:
+                if e == 5:
+                    print_list+='%'
+                elif e == 4:
+                    print_list+='@'
+                elif e == 3:
+                    print_list+='#'
+                elif e == 2:
+                    print_list+='*'
+                elif e == 1:
+                    print_list+='.'
+                elif e == 0:
+                    print_list+=' '
+                else:
+                    print_list+=' '
+
+            print_list+=' '* int(extra_symbol)
+            print print_list
+    elif preload == True:
+        for x in xrange(len(p_data)):
+            example=p_data[x:x+1].values.tolist()[0]
+            print_list=' '*extra_symbol
+            for e in example:
+                if e == 5:
+                    print_list+='%'
+                elif e == 4:
+                    print_list+='@'
+                elif e == 3:
+                    print_list+='#'
+                elif e == 2:
+                    print_list+='*'
+                elif e == 1:
+                    print_list+='.'
+                elif e == 0:
+                    print_list+=' '
+                else:
+                    print_list+=' '
+
+            print_list+=' '* int(extra_symbol)
+            plist.append(print_list)
+            return plist
+
+
+
+
+
+        #
 
 
 
 if __name__=='__main__':
-    img_name='/Users/sn0wfree/Documents/python_projects/personal_terminal_demo/demo/test/0052.bmp'
-    img=Image.open(img_name)
-    s=pic2symboltext().pandalizationfortest(img)
-    test='/Users/sn0wfree/Documents/python_projects/personal_terminal_demo/demo'
-    fo=os.walk(test)
-    files_full_infos=[]
-    for (root,subfolder,file_a) in fo:
-        files_full_infos.append((root,subfolder,file_a))
+    #img_name='/Users/admin/Documents/python/personal_terminal_demo/demo/test/0052.bmp'
+    #img=Image.open(img_name)
+    test='/Users/admin/Documents/python/personal_terminal_demo/demo/video2picture/Capture_png'
+    ff=scan_all_pic_file_process(test)
+    total_files=[]
+    gc.collect()
+    for f in ff:
+        total_file=f[0]+'/'+f[1]
+        total_files.append(total_file)
+    #a=total_files[2678]
+    movie_orderd=[]
+    for img_file_png in total_files:
+        showoutput(img_file_png)
+        time.sleep(0.01)
 
-    print getDirList(test)
-    for files_full_info in files_full_infos:
-        print files_full_info,'\n'
+        #movie_orderd.append(l)
+    """print "input process completed"
+    print "already begin"
+    begin=input("should we begin?(yes or no)")
+    if begin == "yes":
+        for movie_order in movie_orderd:
+            for l in movie_order:
+                print l"""
 
 
 
 
 
+    #
+    #im=Image.open(a)
+    #d=pic2symboltext()
+    #data=d.pandalizationfortest(im)
 
 
 
-    #a=TestPlatform()
-    #print a.platform_system
-    #v.printdash()
-    #print g.height
+    #print data
+    #print '*'*pic2symboltext().width
+    #print '#'*pic2symboltext().width
+    #print '@'*pic2symboltext().width
+    #print '%'*pic2symboltext().width
+    #print '$'*pic2symboltext().width
+    #print '&'*pic2symboltext().width
+    #print '='*pic2symboltext().width
+    #print ' '*pic2symboltext().width
+    #print '.'*pic2symboltext().width
+    #print '@%'*(pic2symboltext().width/2)
+
+
+
+
+    #ff=[]
+    #ff.append(fff[199])
+    #ff.append(fff[100])

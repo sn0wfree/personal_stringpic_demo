@@ -1,7 +1,9 @@
 #coding=utf-8
 import os,platform,sys
-import Image
-
+from PIL import Image
+import pandas as pd
+import numpy as np
+import multiprocessing as mp
 
 
 
@@ -97,13 +99,15 @@ class show_terminal_bound:
         self.system= platform.system()#system
 
 
-class pic2symboltext():
+class pic2symboltext:
     def __init__(self):
         self.name='pic2text process'
         rows,columns=os.popen('stty size', 'r').read().split()
         self.width = int(columns)
         self.height = int(rows)
         self.system= platform.system()#system
+        self.symboldataset=None
+
 
     def preprocess(self,img_name):
 
@@ -113,21 +117,46 @@ class pic2symboltext():
         #windows_w=self.width
         #windows_h=self.height
         #img = img.resize((w,h))
-        img = img.convert('L')
+        #img = img.convert('L')
+
         return img
 
-    def create_symbol_text(img):
-        """ 将已经预处理好的图片根据color生成字符字符串，存放到 pic_str 变量中 """
-        pix = img.load()
-        pic_str = ''
-        width, height = img.size
-        for h in xrange(height):
-                for w in xrange(width):
-                    if pix[w,h]==255:
-                        
+    def pandalizationfortest(self,character_image):
+        pix=character_image.load()
+        self.symboldataset=np.zeros((character_image.size[1],character_image.size[0]))
+        data=self.scan_rep(pix,character_image)
+        dataset=pd.DataFrame(data)
+        #print datas
+        self.symboldataset=dataset
+        return dataset
+
+        #data[0][1]=1
+    def scan_rep(self,pix,character_image):
+        data=self.symboldataset
+        for i in xrange(character_image.size[0]):
+            for j in xrange(character_image.size[1]):
+                data[j,i]=pix[i,j][0]
+                #if data[i][j]<10:
+                #    data[i][j]=0
+                #else:
+                #    data[i][j]=1
+
+
+
+        return data
+
+
+    #def create_symbol_text(img):
+    #    """ 将已经预处理好的图片根据color生成字符字符串，存放到 pic_str 变量中 """
+    #    pix = img.load()
+    #    pic_str = ''
+    #    width, height = img.size
+    #    pandalizationfortest（img）
+
+
 
                     #pic_str += color[int(pix[w,h]) * 14 /255]
-                pic_str += '\n'
+                #pic_str += '\n'
         return pic_str
 
 
@@ -141,13 +170,25 @@ class pic2symboltext():
 
 
 
+#def multi_scan(img):
+#    pool = mp.Pool()
+    #for rdir in rdirs:
+#    yv=pool.map
 
 
 
 
 if __name__=='__main__':
+    img_name='/Users/sn0wfree/Documents/python_projects/personal_terminal_demo/demo/test/0052.bmp'
+    img=Image.open(img_name)
+    s=pic2symboltext().pandalizationfortest(img)
+    print s[0]
 
-    a=TestPlatform()
+
+
+
+
+    #a=TestPlatform()
     #print a.platform_system
-    v.printdash()
+    #v.printdash()
     #print g.height

@@ -114,10 +114,12 @@ class pic2symboltext:
         img = Image.open(img_name)
         img_w, img_h = img.size
         #img_m = max(img.size)
-        #windows_w=self.width
-        #windows_h=self.height
-        #img = img.resize((w,h))
+        windows_w=self.width
+        windows_h=self.height
+        img = img.resize((w,h))
         #img = img.convert('L')
+        '接下来写图片调整大小调整程序'
+
 
         return img
 

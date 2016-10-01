@@ -99,6 +99,8 @@ class show_terminal_bound:
         self.system= platform.system()#system
 
 
+
+
 class pic2symboltext:
     def __init__(self):
         self.name='pic2text process'
@@ -172,6 +174,39 @@ class pic2symboltext:
 
 
 
+
+def bmp2png(bmp_img_name):
+    name,ext = os.path.splitext(bmp_img_name)
+    if ext.lower() == '.bmp':
+        target= name +'.png'
+    Image.open(bmp_img_name).save(target)
+
+    pass
+
+
+
+def getDirList( p ):
+        p = str( p )
+        if p=="":
+              return [ ]
+        #p = p.replace( "/","/")
+        if p[-1] != "/":
+             p = p+"/"
+        a = os.listdir( p )
+        b = [ x   for x in a if os.path.isdir( p + x ) ]
+        return b
+
+def scanfolderprocess(rdir):
+    fo=os.walk(rdir)
+    f=[]
+    for root,subfolder,files in fo:
+        #print root
+        num=root.lstrip(rdir)
+        #print num,type(num)
+
+    return f
+
+
 #def multi_scan(img):
 #    pool = mp.Pool()
     #for rdir in rdirs:
@@ -184,7 +219,18 @@ if __name__=='__main__':
     img_name='/Users/sn0wfree/Documents/python_projects/personal_terminal_demo/demo/test/0052.bmp'
     img=Image.open(img_name)
     s=pic2symboltext().pandalizationfortest(img)
-    print s[0]
+    test='/Users/sn0wfree/Documents/python_projects/personal_terminal_demo/demo'
+    fo=os.walk(test)
+    files_full_infos=[]
+    for (root,subfolder,file_a) in fo:
+        files_full_infos.append((root,subfolder,file_a))
+
+    print getDirList(test)
+    for files_full_info in files_full_infos:
+        print files_full_info,'\n'
+
+
+
 
 
 

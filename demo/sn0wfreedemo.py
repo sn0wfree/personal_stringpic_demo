@@ -127,7 +127,7 @@ class pic2symboltext:
         scale=min(scaleY, scaleX)
         resize_w=scale*img_w
         resize_h=scale*img_h
-        resize=(int(resize_w),int(resize_h))
+        resize=(int(resize_w*2.6),int(resize_h))
         #if img_h >= windows_h:
         #    resize_h=windows_h
             #print img_h,windows_h
@@ -228,8 +228,8 @@ def scan_all_pic_file_process(rdir):
         #print num,type(num)
     return f
 
-def showoutput(img_file_png,preload=False,text=False):
-    plist=[]
+def showoutput(img_file_png,preload=True):
+
     p=pic2symboltext()
     #print 'terminal_bound:%s,%s' %(p.width,p.height)
     #p_img=p.preprocess(a)
@@ -259,9 +259,10 @@ def showoutput(img_file_png,preload=False,text=False):
             print_list+=' '* int(extra_symbol)
             print print_list
     elif preload == True:
+        plist=[]
         for x in xrange(len(p_data)):
             example=p_data[x:x+1].values.tolist()[0]
-            print_list=' '*extra_symbol
+            print_list=' '*int(extra_symbol)
             for e in example:
                 if e == 5:
                     print_list+='%'
@@ -280,20 +281,21 @@ def showoutput(img_file_png,preload=False,text=False):
 
             print_list+=' '* int(extra_symbol)
             plist.append(print_list)
-            return plist
+        return plist
 
 
 
 
 
-        #
+
 
 
 
 if __name__=='__main__':
     #img_name='/Users/admin/Documents/python/personal_terminal_demo/demo/test/0052.bmp'
     #img=Image.open(img_name)
-    test='/Users/admin/Documents/python/personal_terminal_demo/demo/video2picture/Capture_png'
+    preload = raw_input('pre-load feature disable,should preload?(yes or no):')
+    test='/Users/admin/Documents/python/personal_terminal_demo/demo/video2picture/Capture_png30'
     ff=scan_all_pic_file_process(test)
     total_files=[]
     gc.collect()
@@ -301,46 +303,19 @@ if __name__=='__main__':
         total_file=f[0]+'/'+f[1]
         total_files.append(total_file)
     #a=total_files[2678]
-    movie_orderd=[]
-    for img_file_png in total_files:
-        showoutput(img_file_png)
-        time.sleep(0.01)
 
-        #movie_orderd.append(l)
-    """print "input process completed"
-    print "already begin"
-    begin=input("should we begin?(yes or no)")
-    if begin == "yes":
+    movie_orderd=[]
+    if preload =='Disable' or preload =='no':
+        for img_file_png in total_files:
+            showoutput(img_file_png,False)
+    elif preload=='yes' or preload =='enable':
+        pool = mp.Pool()
+        #for rdir in rdirs:
+        #pool.map(bmp2png,ff)
+
+        #for img_file_png in total_files:
+        plist=pool.map(showoutput,total_files)
+        movie_orderd.append(plist)
         for movie_order in movie_orderd:
             for l in movie_order:
-                print l"""
-
-
-
-
-
-    #
-    #im=Image.open(a)
-    #d=pic2symboltext()
-    #data=d.pandalizationfortest(im)
-
-
-
-    #print data
-    #print '*'*pic2symboltext().width
-    #print '#'*pic2symboltext().width
-    #print '@'*pic2symboltext().width
-    #print '%'*pic2symboltext().width
-    #print '$'*pic2symboltext().width
-    #print '&'*pic2symboltext().width
-    #print '='*pic2symboltext().width
-    #print ' '*pic2symboltext().width
-    #print '.'*pic2symboltext().width
-    #print '@%'*(pic2symboltext().width/2)
-
-
-
-
-    #ff=[]
-    #ff.append(fff[199])
-    #ff.append(fff[100])
+                print l

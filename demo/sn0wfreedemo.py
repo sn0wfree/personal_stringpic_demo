@@ -218,7 +218,7 @@ def getDirList( p ):
 def scan_all_pic_file_process(rdir):
     fo=os.walk(rdir)
     f=[]
-    for (root,subfolder,files_a) in fo:
+    for root,subfolder,files_a in fo:
         pass
     for file_a in files_a:
         full_path_for_each_bmp=(root,file_a)
@@ -235,7 +235,13 @@ def showoutput(img_file_png,preload=True):
     #p_img=p.preprocess(a)
     p_data=p.pandalizationfortest(img_file_png)
     #print p_data[44:45]
-    extra_symbol=(p.width-p.resize[0])/2
+    if p.width-p.resize[0]>=0:
+        extra_symbol=(p.width-p.resize[0])/2
+    else:
+        extra_symbol=0
+
+
+
     if preload == False:
         for x in xrange(len(p_data)):
             example=p_data[x:x+1].values.tolist()[0]
@@ -295,7 +301,8 @@ if __name__=='__main__':
     #img_name='/Users/admin/Documents/python/personal_terminal_demo/demo/test/0052.bmp'
     #img=Image.open(img_name)
     preload = raw_input('pre-load feature disable,should preload?(yes or no):')
-    test='/Users/admin/Documents/python/personal_terminal_demo/demo/video2picture/Capture_png30'
+    test='/Users/sn0wfree/Documents/python_projects/personal_stringpic_demo/demo/video2picture/Capture_png30'
+    #test2="./video2picture/capture_png30"
     ff=scan_all_pic_file_process(test)
     total_files=[]
     gc.collect()
@@ -315,7 +322,48 @@ if __name__=='__main__':
 
         #for img_file_png in total_files:
         plist=pool.map(showoutput,total_files)
-        movie_orderd.append(plist)
-        for movie_order in movie_orderd:
-            for l in movie_order:
-                print l
+        test=raw_input("preload have already completed,should we start?(yes)")
+        re_test="0"
+
+
+        while 1:
+            p=0
+
+            if test == "yes" :
+                p=1
+            elif re_test=="yes":
+                p=1
+            elif re_test=="no" and test == "done":
+                break
+            if p==1:
+
+                for ls in plist:
+                    fff=time.time()
+                    for l in ls:
+                        print l
+                    t=time.time()-fff
+                    if t<=(1/25.0):
+                        time.sleep(1/25.0-t)
+                    else:
+                        pass
+
+            re_test=raw_input("preload have already completed,should we re-start?(yes)")
+            if test=="yes":
+                test="done"
+            else:
+                pass
+
+
+
+
+        #print plist
+        #movie_orderd.append(plist)
+        #for i in xrange(10):
+
+
+            #print "time=%s"%round((i/30.0),5)
+            #temp=raw_input("stop?")
+
+
+        #print "%s\n"%l
+            #
